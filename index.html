@@ -79,6 +79,47 @@
   .btn-restart { background: var(--rojo); color: #fff; border: none; padding: 0.9rem 2.5rem; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; border-radius: 3px; transition: background 0.2s; }
   .btn-restart:hover { background: #e01832; }
 
+  /* ── DESGLOSE POR DIMENSIÓN Y ÁREA ── */
+  .res-analysis { max-width: 680px; margin: 0 auto 2.5rem; text-align: left; }
+  .res-analysis-title {
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+    color: #666; text-align: center; margin-bottom: 1.4rem;
+    display: flex; align-items: center; gap: 0.8rem;
+  }
+  .res-analysis-title::before, .res-analysis-title::after {
+    content: ''; flex: 1; height: 1px; background: #2a2a2a;
+  }
+
+  .dim-block { margin-bottom: 1.2rem; background: var(--gris-oscuro); border: 1px solid #2a2a2a; border-radius: 4px; overflow: hidden; }
+  .dim-block-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.75rem 1rem; gap: 1rem;
+  }
+  .dim-block-name { font-size: 0.82rem; font-weight: 600; color: var(--blanco); }
+  .dim-block-stat { display: flex; align-items: center; gap: 0.6rem; flex-shrink: 0; }
+  .dim-block-pct { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; }
+  .dim-block-fraction { font-size: 0.7rem; color: #666; }
+  .dim-bar-outer { height: 4px; background: #222; margin: 0 1rem 0.8rem; border-radius: 2px; }
+  .dim-bar-inner { height: 100%; border-radius: 2px; transition: width 0.8s ease; }
+
+  .area-rows { padding: 0 1rem 0.8rem; display: grid; gap: 0.45rem; }
+  .area-row { display: flex; align-items: center; gap: 0.7rem; }
+  .area-row-label { font-size: 0.73rem; color: #999; flex: 1; line-height: 1.35; }
+  .area-row-bar-outer { width: 90px; height: 5px; background: #222; border-radius: 3px; flex-shrink: 0; }
+  .area-row-bar-inner { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
+  .area-row-score { font-size: 0.68rem; font-weight: 600; min-width: 2.8rem; text-align: right; flex-shrink: 0; }
+
+  .pct-green  { color: #2ea96a; } .bar-green  { background: #2ea96a; }
+  .pct-yellow { color: #C9943A; } .bar-yellow { background: #C9943A; }
+  .pct-red    { color: #e04040; } .bar-red    { background: #e04040; }
+
+  .res-priority { max-width: 680px; margin: 0 auto 2rem; }
+  .res-priority-title { font-size: 0.68rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #666; text-align: center; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.8rem; }
+  .res-priority-title::before, .res-priority-title::after { content: ''; flex: 1; height: 1px; background: #2a2a2a; }
+  .priority-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
+  .priority-chip { font-size: 0.72rem; padding: 0.3rem 0.75rem; border-radius: 2px; border: 1px solid #9B1C1C; background: #2e0a0a; color: #ffb3b3; }
+  .priority-chip.ok { border-color: #1a5c3a; background: #0a2e1a; color: #7effc1; }
+
   #intro-screen { text-align: center; padding: 3rem 1rem; animation: fadeIn 0.5s ease; }
   #intro-screen h2 { font-family: 'Playfair Display', serif; font-size: 2.4rem; line-height: 1.2; margin-bottom: 1rem; }
   #intro-screen h2 span { color: var(--rojo); }
@@ -273,6 +314,19 @@
       <div class="rb-item"><div class="rb-num green" id="res-correct"></div><div class="rb-label">Correctas</div></div>
       <div class="rb-item"><div class="rb-num red"   id="res-wrong"></div><div class="rb-label">Incorrectas</div></div>
     </div>
+
+    <!-- Desglose por dimensión y área -->
+    <div class="res-analysis">
+      <div class="res-analysis-title">Desglose por Dimensión y Área</div>
+      <div id="dim-breakdown"></div>
+    </div>
+
+    <!-- Áreas prioritarias -->
+    <div class="res-priority">
+      <div class="res-priority-title">Áreas que necesitan refuerzo</div>
+      <div class="priority-chips" id="priority-chips"></div>
+    </div>
+
     <button class="btn-restart" onclick="restartQuiz()">Reiniciar Simulador</button>
   </div>
 </main>
@@ -998,18 +1052,133 @@ function prevQuestion() {
 function showResults() {
   document.getElementById('quiz-screen').style.display = 'none';
   document.getElementById('results-screen').style.display = 'block';
+
   const score = answers.filter((a, i) => a === shuffledQuestions[i].correct).length;
   const pct   = Math.round(score / shuffledQuestions.length * 100);
+
   document.getElementById('res-score').textContent   = pct + '%';
   document.getElementById('res-correct').textContent = score;
   document.getElementById('res-wrong').textContent   = shuffledQuestions.length - score;
+
   let msg, sub;
   if      (pct >= 90) { msg='Excelente desempeño profesional';    sub='Dominas sólidamente las competencias pedagógicas, normativas y éticas requeridas para el ERP. Estás muy bien preparada.'; }
-  else if (pct >= 75) { msg='Buen nivel de preparación';           sub='Tienes buen dominio general. Revisa las áreas con dificultad, especialmente las relacionadas con el Código de Ética (OD 22/2023) y las Normas de Convivencia.'; }
-  else if (pct >= 60) { msg='Preparación en progreso';             sub='Hay áreas que requieren refuerzo. Relee la OD 22/2023, las Normas de Convivencia, la Ley 136-03 y los Estándares Profesionales del MINERD.'; }
-  else                { msg='Necesitas más práctica';              sub='Recomendamos releer los documentos completos antes de reintentar: Código de Ética, Normas de Convivencia, Ley 136-03 y Estándares de Desempeño Docente.'; }
+  else if (pct >= 75) { msg='Buen nivel de preparación';           sub='Tienes buen dominio general. Revisa las áreas con dificultad que se muestran abajo.'; }
+  else if (pct >= 60) { msg='Preparación en progreso';             sub='Hay áreas que requieren refuerzo. Identifícalas en el desglose y relee los documentos normativos correspondientes.'; }
+  else                { msg='Necesitas más práctica';              sub='Recomendamos releer los documentos completos antes de reintentar. El desglose de abajo muestra dónde enfocar el estudio.'; }
+
   document.getElementById('res-msg').textContent = msg;
   document.getElementById('res-sub').textContent = sub;
+
+  // ── MAPEO: dimensión → áreas que contiene ──────────────────
+  const dimMap = {
+    'Planificación Pedagógica': {
+      label: 'Planificación Pedagógica',
+      areas: ['Área 1: Nivel de formación académica', 'Área 2: Aplicación del currículo', 'Área 3: Resultados de aprendizaje']
+    },
+    'Gestión del Aprendizaje': {
+      label: 'Gestión del Aprendizaje',
+      areas: ['Área 3: Resultados de aprendizaje', 'Área 6: Liderazgo en el trabajo', 'Área 8: Trabajo en equipo']
+    },
+    'Comportamientos Profesionales': {
+      label: 'Comportamientos Profesionales',
+      areas: ['Área 4: Cumplimiento de normas institucionales', 'Área 5: Relaciones con estudiantes, colegas y comunidad', 'Área 6: Liderazgo en el trabajo', 'Área 7: Formación continua', 'Área 8: Trabajo en equipo']
+    }
+  };
+
+  // Nombres cortos para mostrar en la UI
+  const areaShortNames = {
+    'Área 1: Nivel de formación académica':                        'Área 1 · Formación académica',
+    'Área 2: Aplicación del currículo':                            'Área 2 · Aplicación del currículo',
+    'Área 3: Resultados de aprendizaje':                           'Área 3 · Resultados de aprendizaje',
+    'Área 4: Cumplimiento de normas institucionales':              'Área 4 · Normas institucionales',
+    'Área 5: Relaciones con estudiantes, colegas y comunidad':     'Área 5 · Relaciones con la comunidad',
+    'Área 6: Liderazgo en el trabajo':                             'Área 6 · Liderazgo',
+    'Área 7: Formación continua':                                  'Área 7 · Formación continua',
+    'Área 8: Trabajo en equipo':                                   'Área 8 · Trabajo en equipo'
+  };
+
+  // ── CALCULAR ACIERTOS POR DIMENSIÓN Y ÁREA ─────────────────
+  const dimStats  = {};   // { dim: { correct, total } }
+  const areaStats = {};   // { area: { correct, total } }
+
+  shuffledQuestions.forEach((q, i) => {
+    const isOk = answers[i] === q.correct;
+
+    // Por dimensión
+    const d = q.dim;
+    if (!dimStats[d]) dimStats[d] = { correct: 0, total: 0 };
+    dimStats[d].total++;
+    if (isOk) dimStats[d].correct++;
+
+    // Por área (normalizar: quitar lo que va después del primer paréntesis / aclaración)
+    const a = q.area.replace(/\(.*?\)/g, '').trim();
+    if (!areaStats[a]) areaStats[a] = { correct: 0, total: 0 };
+    areaStats[a].total++;
+    if (isOk) areaStats[a].correct++;
+  });
+
+  // ── CONSTRUIR HTML DE DESGLOSE ──────────────────────────────
+  function colorClass(p) {
+    if (p >= 75) return { pct: 'pct-green',  bar: 'bar-green'  };
+    if (p >= 50) return { pct: 'pct-yellow', bar: 'bar-yellow' };
+    return            { pct: 'pct-red',    bar: 'bar-red'    };
+  }
+
+  let dimHTML = '';
+  Object.entries(dimMap).forEach(([dimKey, dimInfo]) => {
+    const ds = dimStats[dimKey] || { correct: 0, total: 0 };
+    if (ds.total === 0) return;
+    const dp = Math.round(ds.correct / ds.total * 100);
+    const dc = colorClass(dp);
+
+    // Filas de áreas
+    let areaRowsHTML = '';
+    const seenAreas = new Set();
+    dimInfo.areas.forEach(aKey => {
+      if (seenAreas.has(aKey)) return;
+      seenAreas.add(aKey);
+      const as = areaStats[aKey] || { correct: 0, total: 0 };
+      if (as.total === 0) return;
+      const ap  = Math.round(as.correct / as.total * 100);
+      const ac  = colorClass(ap);
+      const short = areaShortNames[aKey] || aKey;
+      areaRowsHTML += `
+        <div class="area-row">
+          <span class="area-row-label">${short}</span>
+          <div class="area-row-bar-outer"><div class="area-row-bar-inner ${ac.bar}" style="width:${ap}%"></div></div>
+          <span class="area-row-score ${ac.pct}">${as.correct}/${as.total}</span>
+        </div>`;
+    });
+
+    dimHTML += `
+      <div class="dim-block">
+        <div class="dim-block-header">
+          <span class="dim-block-name">${dimInfo.label}</span>
+          <div class="dim-block-stat">
+            <span class="dim-block-pct ${dc.pct}">${dp}%</span>
+            <span class="dim-block-fraction">${ds.correct}/${ds.total}</span>
+          </div>
+        </div>
+        <div class="dim-bar-outer"><div class="dim-bar-inner ${dc.bar}" style="width:${dp}%"></div></div>
+        <div class="area-rows">${areaRowsHTML}</div>
+      </div>`;
+  });
+
+  document.getElementById('dim-breakdown').innerHTML = dimHTML;
+
+  // ── CHIPS DE ÁREAS PRIORITARIAS ─────────────────────────────
+  const allAreas = Object.entries(areaStats).map(([k, v]) => ({
+    key: k,
+    short: areaShortNames[k] || k,
+    pct: v.total > 0 ? Math.round(v.correct / v.total * 100) : 100
+  })).sort((a, b) => a.pct - b.pct);
+
+  let chipsHTML = '';
+  allAreas.forEach(a => {
+    const isWeak = a.pct < 75;
+    chipsHTML += `<span class="priority-chip ${isWeak ? '' : 'ok'}">${a.short} · ${a.pct}%</span>`;
+  });
+  document.getElementById('priority-chips').innerHTML = chipsHTML || '<span style="color:#666;font-size:0.8rem">Sin datos suficientes</span>';
 }
 
 function restartQuiz() {
