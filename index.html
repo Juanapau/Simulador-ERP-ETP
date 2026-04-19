@@ -1523,8 +1523,9 @@ function construirPDF(jsPDF) {
     const qLines  = wrap(q.text, CW-4, 8.5, 'bold');
     let optH = 0;
     q.options.forEach((opt,oi) => {
-      const L = wrap(`${letters[oi]}.  ${opt}`, CW-11, 7.8);
-      optH += L.length*LH_O + 3;
+      const isTagged = (oi === userAns) || (oi === q.correct);
+      const L = wrap(opt, isTagged ? CW-38 : CW-11, 7.8);
+      optH += L.length*LH_O + (isTagged ? LH_O+1 : 0) + 4 + 1.5;
     });
     const fbLines = wrap(q.feedback, CW-6, 7.2);
     const total_h = 7 + qLines.length*LH_Q + 2 + optH + 2 + 6 + fbLines.length*LH_F + 5 + 4 + 4;
@@ -1549,8 +1550,16 @@ function construirPDF(jsPDF) {
     q.options.forEach((opt, oi) => {
       const isUser = oi === userAns;
       const isCor  = oi === q.correct;
-      const optLines = wrap(opt, CW-11, 7.8);
-      const oh = optLines.length * LH_O + 3;
+      const tagged = isUser || isCor;
+
+      // Si tiene etiqueta, reducir ancho del texto para que no se solape
+      const textMaxW = tagged ? CW - 38 : CW - 11;
+      const optLines = wrap(opt, textMaxW, 7.8);
+      // Etiqueta siempre en línea propia si el texto es largo
+      const tag = (isUser && isCor) ? '< Tu respuesta (correcta)' : isCor ? '< Respuesta correcta' : '< Tu respuesta (incorrecta)';
+      // Altura: líneas de texto + (si tagged, 1 línea extra para etiqueta) + padding
+      const tagLineH = tagged ? LH_O + 1 : 0;
+      const oh = optLines.length * LH_O + tagLineH + 4;
 
       checkSpace(oh + 1);
 
@@ -1568,16 +1577,17 @@ function construirPDF(jsPDF) {
       setColor(obg === OSCURO ? GRIS : NEGRO);
       doc.text(letters[oi], cx, cy+0.9, {align:'center'});
 
-      // Texto opción
-      doc.setFontSize(7.8); doc.setFont('helvetica', isUser||isCor ? 'bold' : 'normal');
+      // Texto opción — alineado a la izquierda, nunca llega al borde derecho
+      doc.setFontSize(7.8); doc.setFont('helvetica', tagged ? 'bold' : 'normal');
       setColor(oCol);
       optLines.forEach((ol, li) => { doc.text(ol, ML+9, y+3.5+li*LH_O); });
 
-      // Etiqueta derecha
-      if (isCor || isUser) {
-        const tag = (isUser && isCor) ? '← Tu respuesta ✓' : isCor ? '← Correcta' : '← Tu respuesta';
-        doc.setFontSize(6.2); doc.setFont('helvetica','bold'); setColor(isCor ? CORREC : WRONG);
-        doc.text(tag, PW-MR-1, y+3.5, {align:'right'});
+      // Etiqueta en línea propia debajo del texto de la opción
+      if (tagged) {
+        const tagY = y + 2.5 + optLines.length * LH_O + 1.5;
+        doc.setFontSize(6.2); doc.setFont('helvetica','bolditalic');
+        setColor(isCor ? CORREC : WRONG);
+        doc.text(tag, ML+9, tagY);
       }
 
       y += oh + 1.5;
