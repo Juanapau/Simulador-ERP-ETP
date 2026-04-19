@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Simulador ERP – Docente Técnico Profesional</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   :root {
     --rojo: #C0152A;
@@ -78,6 +79,68 @@
   .rb-label { font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: #666; margin-top: 4px; }
   .btn-restart { background: var(--rojo); color: #fff; border: none; padding: 0.9rem 2.5rem; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; border-radius: 3px; transition: background 0.2s; }
   .btn-restart:hover { background: #e01832; }
+
+  .btn-pdf {
+    background: none;
+    color: var(--dorado);
+    border: 2px solid var(--dorado);
+    padding: 0.9rem 2.5rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .btn-pdf:hover { background: var(--dorado); color: #000; }
+  .btn-pdf:disabled { opacity: 0.5; cursor: wait; }
+  .results-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 0.5rem; }
+
+  /* ── RELOJ CRONÓMETRO ── */
+  .timer-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 0.3rem 0.9rem;
+    background: #111;
+    border: 1px solid #2a2a2a;
+    border-radius: 4px;
+    min-width: 90px;
+  }
+  .timer-label {
+    font-size: 0.58rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #555;
+    font-weight: 600;
+  }
+  .timer-display {
+    font-family: 'Courier New', monospace;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--dorado);
+    letter-spacing: 2px;
+    line-height: 1;
+    transition: color 0.4s;
+  }
+  .timer-display.running { color: var(--dorado); }
+  .timer-display.stopped { color: #2ea96a; }
+  .timer-dot {
+    display: inline-block;
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--dorado);
+    margin-bottom: 1px;
+    animation: pulse 1s infinite;
+  }
+  .timer-dot.stopped { background: #2ea96a; animation: none; }
+  @keyframes pulse { 0%,100%{ opacity:1; } 50%{ opacity:0.2; } }
 
   /* ── DESGLOSE POR DIMENSIÓN Y ÁREA ── */
   .res-analysis { max-width: 680px; margin: 0 auto 2.5rem; text-align: left; }
@@ -213,6 +276,10 @@
     <div class="progress-bar-outer"><div class="progress-bar-inner" id="progress-bar" style="width:0%"></div></div>
     <span class="score-counter" id="score-counter">0 / 50 respondidas</span>
   </div>
+  <div class="timer-area" id="timer-area">
+    <span class="timer-label"><span class="timer-dot" id="timer-dot"></span> Tiempo</span>
+    <span class="timer-display" id="timer-display">00:00:00</span>
+  </div>
 </header>
 
 <main>
@@ -313,6 +380,10 @@
     <div class="result-breakdown">
       <div class="rb-item"><div class="rb-num green" id="res-correct"></div><div class="rb-label">Correctas</div></div>
       <div class="rb-item"><div class="rb-num red"   id="res-wrong"></div><div class="rb-label">Incorrectas</div></div>
+      <div class="rb-item">
+        <div class="rb-num" id="res-time" style="font-size:1.8rem;color:var(--dorado);letter-spacing:2px;font-family:'Courier New',monospace;">--:--:--</div>
+        <div class="rb-label">Tiempo total</div>
+      </div>
     </div>
 
     <!-- Desglose por dimensión y área -->
@@ -327,7 +398,10 @@
       <div class="priority-chips" id="priority-chips"></div>
     </div>
 
-    <button class="btn-restart" onclick="restartQuiz()">Reiniciar Simulador</button>
+    <div class="results-actions">
+      <button class="btn-restart" onclick="restartQuiz()">↺ Reiniciar Simulador</button>
+      <button class="btn-pdf" id="btn-pdf" onclick="generarPDF()">⬇ Descargar Informe PDF</button>
+    </div>
   </div>
 </main>
 
@@ -951,6 +1025,55 @@ let shuffledQuestions = [];
 let currentQ = 0;
 let answers   = [];
 
+// ── CRONÓMETRO ──────────────────────────────────────────
+let timerInterval = null;
+let timerSeconds  = 0;
+let timerFinalStr = '00:00:00';
+
+function timerFormat(s) {
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  return [h, m, sec].map(v => String(v).padStart(2, '0')).join(':');
+}
+
+function timerStart() {
+  timerSeconds = 0;
+  clearInterval(timerInterval);
+  const display = document.getElementById('timer-display');
+  const dot     = document.getElementById('timer-dot');
+  display.className = 'timer-display running';
+  dot.className     = 'timer-dot';
+  display.textContent = '00:00:00';
+  timerInterval = setInterval(() => {
+    timerSeconds++;
+    display.textContent = timerFormat(timerSeconds);
+  }, 1000);
+}
+
+function timerStop() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+  timerFinalStr = timerFormat(timerSeconds);
+  const display = document.getElementById('timer-display');
+  const dot     = document.getElementById('timer-dot');
+  display.className   = 'timer-display stopped';
+  dot.className       = 'timer-dot stopped';
+  display.textContent = timerFinalStr;
+}
+
+function timerReset() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+  timerSeconds  = 0;
+  timerFinalStr = '00:00:00';
+  const display = document.getElementById('timer-display');
+  const dot     = document.getElementById('timer-dot');
+  display.className   = 'timer-display';
+  dot.className       = 'timer-dot stopped';
+  display.textContent = '00:00:00';
+}
+
 function toggleCard(card) {
   card.classList.toggle('open');
 }
@@ -978,6 +1101,7 @@ function startQuiz() {
   prepareQuestions();
   document.getElementById('intro-screen').style.display = 'none';
   document.getElementById('quiz-screen').style.display  = 'block';
+  timerStart();
   renderQuestion();
 }
 
@@ -1052,6 +1176,8 @@ function prevQuestion() {
 function showResults() {
   document.getElementById('quiz-screen').style.display = 'none';
   document.getElementById('results-screen').style.display = 'block';
+  timerStop();
+  document.getElementById('res-time').textContent = timerFinalStr;
 
   const score = answers.filter((a, i) => a === shuffledQuestions[i].correct).length;
   const pct   = Math.round(score / shuffledQuestions.length * 100);
@@ -1187,7 +1313,331 @@ function restartQuiz() {
   document.getElementById('quiz-screen').style.display    = 'block';
   document.getElementById('progress-bar').style.width     = '0%';
   document.getElementById('score-counter').textContent    = '0 / 50 respondidas';
+  timerReset();
+  timerStart();
   renderQuestion();
+}
+
+// ═══════════════════════════════════════════════════════
+//  GENERADOR DE INFORME PDF
+// ═══════════════════════════════════════════════════════
+function generarPDF() {
+  const btn = document.getElementById('btn-pdf');
+  btn.disabled = true;
+  btn.textContent = '⏳ Generando PDF...';
+
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+    const PW = 210, PH = 297;
+    const ML = 15, MR = 15, MT = 18, MB = 18;
+    const CW = PW - ML - MR;
+
+    // ── Colores ──────────────────────────────────────────
+    const C_BG      = [13, 13, 13];
+    const C_HEADER  = [26, 26, 26];
+    const C_VERDE   = [29, 185, 84];
+    const C_DORADO  = [201, 148, 58];
+    const C_BLANCO  = [248, 245, 240];
+    const C_GRIS    = [170, 170, 170];
+    const C_CORREC  = [46, 169, 106];
+    const C_WRONG   = [180, 83, 9];
+    const C_FBKG_C  = [10, 46, 26];
+    const C_FBKG_W  = [28, 16, 0];
+    const C_CARD    = [26, 26, 26];
+
+    const score = answers.filter((a, i) => a === shuffledQuestions[i].correct).length;
+    const pct   = Math.round(score / shuffledQuestions.length * 100);
+    const fecha = new Date().toLocaleDateString('es-DO', { day:'2-digit', month:'long', year:'numeric' });
+    const tiempoPDF = timerFinalStr;
+    const letters = ['A','B','C','D'];
+
+    // ────────────────────────────────────────────────────
+    //  UTILIDADES
+    // ────────────────────────────────────────────────────
+    let page = 1;
+    let y = 0;
+
+    function newPage() {
+      doc.addPage();
+      page++;
+      fillBg();
+      drawPageFooter();
+      y = MT;
+    }
+
+    function fillBg() {
+      doc.setFillColor(...C_BG);
+      doc.rect(0, 0, PW, PH, 'F');
+    }
+
+    function drawPageFooter() {
+      doc.setFillColor(...C_HEADER);
+      doc.rect(0, PH - 10, PW, 10, 'F');
+      doc.setDrawColor(...C_VERDE);
+      doc.setLineWidth(0.4);
+      doc.line(0, PH - 10, PW, PH - 10);
+      doc.setFontSize(7);
+      doc.setTextColor(...C_GRIS);
+      doc.setFont('helvetica', 'normal');
+      doc.text('Simulador ERP · Docente Técnico Profesional · MINERD', ML, PH - 4);
+      doc.text(`Pág. ${page}`, PW - MR, PH - 4, { align: 'right' });
+    }
+
+    function checkY(needed) {
+      if (y + needed > PH - MB - 10) { newPage(); }
+    }
+
+    // Wrap text and return array of lines
+    function wrapText(txt, maxW, fontSize, fontStyle) {
+      doc.setFontSize(fontSize);
+      doc.setFont('helvetica', fontStyle || 'normal');
+      return doc.splitTextToSize(txt, maxW);
+    }
+
+    // Draw a filled rounded-corner card background
+    function drawCard(cx, cy, cw, ch, fillColor, strokeColor) {
+      doc.setFillColor(...fillColor);
+      if (strokeColor) { doc.setDrawColor(...strokeColor); doc.setLineWidth(0.3); doc.roundedRect(cx, cy, cw, ch, 1.5, 1.5, 'FD'); }
+      else { doc.roundedRect(cx, cy, cw, ch, 1.5, 1.5, 'F'); }
+    }
+
+    // ────────────────────────────────────────────────────
+    //  PÁGINA 1 — PORTADA
+    // ────────────────────────────────────────────────────
+    fillBg();
+    drawPageFooter();
+
+    // Franja header
+    doc.setFillColor(...C_HEADER);
+    doc.rect(0, 0, PW, 55, 'F');
+    doc.setDrawColor(...C_VERDE);
+    doc.setLineWidth(1);
+    doc.line(0, 55, PW, 55);
+
+    // Badge ERP
+    doc.setFillColor(...C_VERDE);
+    doc.roundedRect(ML, 10, 22, 10, 1.5, 1.5, 'F');
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...C_BG);
+    doc.text('ERP', ML + 11, 17, { align: 'center' });
+
+    // Título
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...C_BLANCO);
+    doc.text('Informe de Resultados', ML + 28, 17);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...C_GRIS);
+    doc.text('EJERCICIO DE RENDIMIENTO PROFESIONAL · TÉCNICO PROFESIONAL', ML + 28, 23);
+
+    // Subtítulo institución
+    doc.setFontSize(8);
+    doc.setTextColor(...C_GRIS);
+    doc.text('Ministerio de Educación de la República Dominicana', ML, 33);
+    doc.text(`Fecha: ${fecha}`, ML, 39);
+    doc.text(`Tiempo de realización: ${tiempoPDF}`, ML, 45);
+
+    // Tarjeta de puntaje
+    y = 65;
+    const pctColor = pct >= 75 ? C_CORREC : pct >= 60 ? C_DORADO : C_WRONG;
+    drawCard(ML, y, CW, 40, C_HEADER, C_VERDE);
+    doc.setFontSize(34);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...pctColor);
+    doc.text(`${pct}%`, ML + CW / 2, y + 20, { align: 'center' });
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...C_GRIS);
+    doc.text('PUNTUACIÓN FINAL', ML + CW / 2, y + 28, { align: 'center' });
+
+    // Correctas / incorrectas
+    y += 48;
+    const colW = (CW - 6) / 2;
+    drawCard(ML, y, colW, 20, C_FBKG_C, C_CORREC);
+    doc.setFontSize(16); doc.setFont('helvetica', 'bold'); doc.setTextColor(...C_CORREC);
+    doc.text(`${score}`, ML + colW / 2, y + 10, { align: 'center' });
+    doc.setFontSize(7); doc.setFont('helvetica', 'normal'); doc.setTextColor(...C_GRIS);
+    doc.text('CORRECTAS', ML + colW / 2, y + 16, { align: 'center' });
+
+    const col2X = ML + colW + 6;
+    drawCard(col2X, y, colW, 20, C_FBKG_W, C_WRONG);
+    doc.setFontSize(16); doc.setFont('helvetica', 'bold'); doc.setTextColor(...C_WRONG);
+    doc.text(`${shuffledQuestions.length - score}`, col2X + colW / 2, y + 10, { align: 'center' });
+    doc.setFontSize(7); doc.setFont('helvetica', 'normal'); doc.setTextColor(...C_GRIS);
+    doc.text('INCORRECTAS', col2X + colW / 2, y + 16, { align: 'center' });
+
+    // Mensaje
+    y += 28;
+    let msg;
+    if      (pct >= 90) msg = 'Excelente desempeño profesional';
+    else if (pct >= 75) msg = 'Buen nivel de preparación';
+    else if (pct >= 60) msg = 'Preparación en progreso';
+    else                msg = 'Necesita más práctica';
+    doc.setFontSize(11); doc.setFont('helvetica', 'bold'); doc.setTextColor(...pctColor);
+    doc.text(msg, ML + CW / 2, y, { align: 'center' });
+
+    // Documentos sustento
+    y += 10;
+    doc.setFontSize(7); doc.setFont('helvetica', 'italic'); doc.setTextColor(...C_GRIS);
+    const sustento = 'Sustentado en: Componente Académico Técnico Profesional y Artes · Estándares Profesionales y del Desempeño Docente · Ley 136-03 · Código de Ética Docente (OD 22/2023)';
+    const susLines = wrapText(sustento, CW, 7, 'italic');
+    susLines.forEach(l => { doc.text(l, ML + CW / 2, y, { align: 'center' }); y += 4; });
+
+    // Separador
+    y += 4;
+    doc.setDrawColor(...C_VERDE);
+    doc.setLineWidth(0.4);
+    doc.line(ML, y, PW - MR, y);
+
+    // Aviso siguiente sección
+    y += 8;
+    doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.setTextColor(...C_BLANCO);
+    doc.text('Detalle completo de los 50 casos', ML + CW / 2, y, { align: 'center' });
+    doc.setFontSize(7); doc.setFont('helvetica', 'normal'); doc.setTextColor(...C_GRIS);
+    y += 5;
+    doc.text('A continuación encontrará cada caso con la respuesta seleccionada, la respuesta correcta y su retroalimentación.', ML + CW / 2, y, { align: 'center' });
+
+    // ────────────────────────────────────────────────────
+    //  PÁGINAS 2+ — CASOS
+    // ────────────────────────────────────────────────────
+    newPage();
+
+    shuffledQuestions.forEach((q, idx) => {
+      const userAns   = answers[idx];
+      const isCorrect = userAns === q.correct;
+      const cardColor = isCorrect ? C_FBKG_C : C_FBKG_W;
+      const accentCol = isCorrect ? C_CORREC  : C_WRONG;
+
+      // ─ Estimación de altura total de la tarjeta ─
+      const numLines = wrapText(`CASO ${idx + 1} DE 50`, CW - 4, 7).length;
+      const qLines   = wrapText(q.text, CW - 4, 8.5, 'bold');
+      let optLinesTotal = 0;
+      q.options.forEach((opt, oi) => {
+        const prefix = `${letters[oi]}.  `;
+        optLinesTotal += wrapText(prefix + opt, CW - 12, 8).length;
+      });
+      const fbLines = wrapText(q.feedback, CW - 8, 7.5);
+      const dimLines = wrapText(q.dim + ' · ' + q.area, CW - 4, 6.5).length;
+
+      const estimH = 6 + (qLines.length * 5) + 3 + (optLinesTotal * 4.5) + 7 + (fbLines.length * 4.5) + 8 + dimLines * 4;
+      checkY(estimH);
+
+      const cardTop = y;
+
+      // ─ Número de caso y estado ─
+      doc.setFontSize(7); doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...accentCol);
+      doc.text(`CASO ${idx + 1} DE 50`, ML, y + 5);
+
+      const estado = isCorrect ? '✓  CORRECTA' : '✗  INCORRECTA';
+      doc.setTextColor(...accentCol);
+      doc.text(estado, PW - MR, y + 5, { align: 'right' });
+
+      y += 7;
+
+      // ─ Pregunta ─
+      doc.setFontSize(8.5); doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...C_BLANCO);
+      qLines.forEach(l => { doc.text(l, ML, y); y += 5; });
+      y += 2;
+
+      // ─ Opciones ─
+      q.options.forEach((opt, oi) => {
+        const isUser = oi === userAns;
+        const isCor  = oi === q.correct;
+
+        let bgOpt = null, txtOpt = C_GRIS, borderOpt = null;
+        if (isCor)       { bgOpt = C_FBKG_C; txtOpt = C_CORREC; borderOpt = C_CORREC; }
+        else if (isUser) { bgOpt = C_FBKG_W; txtOpt = C_WRONG;  borderOpt = C_WRONG;  }
+
+        const prefix = `${letters[oi]}.`;
+        const optText = opt;
+        const fullLines = wrapText(prefix + '  ' + optText, CW - 12, 8);
+        const optH = (fullLines.length * 4.5) + 3;
+
+        if (bgOpt) {
+          doc.setFillColor(...bgOpt);
+          doc.setDrawColor(...borderOpt);
+          doc.setLineWidth(0.25);
+          doc.roundedRect(ML, y - 1, CW, optH, 1, 1, 'FD');
+        }
+
+        // Letra en círculo
+        doc.setFillColor(bgOpt ? borderOpt : [58, 58, 58]);
+        doc.circle(ML + 4, y + 2.5, 2.5, 'F');
+        doc.setFontSize(7); doc.setFont('helvetica', 'bold');
+        doc.setTextColor(bgOpt ? C_BG : [170, 170, 170]);
+        doc.text(letters[oi], ML + 4, y + 3.8, { align: 'center' });
+
+        // Texto opción
+        doc.setFontSize(8); doc.setFont('helvetica', isUser || isCor ? 'bold' : 'normal');
+        doc.setTextColor(...txtOpt);
+        const textLines = doc.splitTextToSize(optText, CW - 12);
+        textLines.forEach((tl, ti) => { doc.text(tl, ML + 9, y + 3 + ti * 4.5); });
+
+        // Indicador al final
+        if (isUser && !isCor) {
+          doc.setFontSize(7); doc.setFont('helvetica', 'bold'); doc.setTextColor(...C_WRONG);
+          doc.text('← Tu respuesta', PW - MR, y + 3, { align: 'right' });
+        }
+        if (isCor) {
+          doc.setFontSize(7); doc.setFont('helvetica', 'bold'); doc.setTextColor(...C_CORREC);
+          const label = (isUser && isCor) ? '← Tu respuesta ✓' : '← Correcta';
+          doc.text(label, PW - MR, y + 3, { align: 'right' });
+        }
+
+        y += optH + 1.5;
+      });
+
+      y += 2;
+
+      // ─ Retroalimentación ─
+      const fbH = (fbLines.length * 4.5) + 6;
+      doc.setFillColor(...cardColor);
+      doc.setDrawColor(...accentCol);
+      doc.setLineWidth(0.3);
+      doc.roundedRect(ML, y, CW, fbH, 1.5, 1.5, 'FD');
+
+      // Etiqueta
+      doc.setFillColor(...accentCol);
+      doc.roundedRect(ML + 2, y + 1.5, 28, 4.5, 1, 1, 'F');
+      doc.setFontSize(6.5); doc.setFont('helvetica', 'bold'); doc.setTextColor(...C_BG);
+      doc.text('RETROALIMENTACIÓN', ML + 16, y + 4.5, { align: 'center' });
+
+      // Texto feedback
+      doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
+      doc.setTextColor(isCorrect ? [124, 255, 193] : [251, 191, 36]);
+      fbLines.forEach((fl, fi) => { doc.text(fl, ML + 3, y + 9 + fi * 4.5); });
+      y += fbH + 2;
+
+      // ─ Área / Dimensión ─
+      doc.setFontSize(6.5); doc.setFont('helvetica', 'italic'); doc.setTextColor(...C_GRIS);
+      doc.text(`${q.dim}  ·  ${q.area}`, ML, y);
+      y += 4;
+
+      // ─ Separador entre casos ─
+      doc.setDrawColor(50, 50, 50);
+      doc.setLineWidth(0.2);
+      doc.line(ML, y, PW - MR, y);
+      y += 5;
+    });
+
+    // ────────────────────────────────────────────────────
+    //  GUARDAR
+    // ────────────────────────────────────────────────────
+    doc.save(`Informe_ERP_${fecha.replace(/\s/g,'_').replace(/,/g,'')}.pdf`);
+
+  } catch(e) {
+    console.error('Error generando PDF:', e);
+    alert('Ocurrió un error al generar el PDF. Por favor recarga la página e intenta nuevamente.');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '⬇ Descargar Informe PDF';
+  }
 }
 </script>
 </body>
