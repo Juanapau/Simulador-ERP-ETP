@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Simulador ERP – Docente Técnico Profesional</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   :root {
     --rojo: #C0152A;
@@ -1319,325 +1318,302 @@ function restartQuiz() {
 }
 
 // ═══════════════════════════════════════════════════════
-//  GENERADOR DE INFORME PDF
+//  GENERADOR DE INFORME PDF — carga jsPDF dinámicamente
 // ═══════════════════════════════════════════════════════
 function generarPDF() {
   const btn = document.getElementById('btn-pdf');
   btn.disabled = true;
-  btn.textContent = '⏳ Generando PDF...';
+  btn.textContent = '⏳ Cargando módulo PDF...';
 
-  try {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  function cargarJsPDF(callback) {
+    if (window.jspdf && window.jspdf.jsPDF) { callback(); return; }
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    script.onload  = () => { btn.textContent = '⏳ Generando PDF...'; callback(); };
+    script.onerror = () => {
+      // Intentar CDN alternativa
+      const s2 = document.createElement('script');
+      s2.src = 'https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js';
+      s2.onload  = () => { btn.textContent = '⏳ Generando PDF...'; callback(); };
+      s2.onerror = () => {
+        btn.disabled = false;
+        btn.innerHTML = '⬇ Descargar Informe PDF';
+        alert('No se pudo cargar el módulo de PDF. Verifique su conexión a internet e intente nuevamente.');
+      };
+      document.head.appendChild(s2);
+    };
+    document.head.appendChild(script);
+  }
 
-    const PW = 210, PH = 297;
-    const ML = 15, MR = 15, MT = 18, MB = 18;
-    const CW = PW - ML - MR;
-
-    // ── Colores ──────────────────────────────────────────
-    const C_BG      = [13, 13, 13];
-    const C_HEADER  = [26, 26, 26];
-    const C_VERDE   = [29, 185, 84];
-    const C_DORADO  = [201, 148, 58];
-    const C_BLANCO  = [248, 245, 240];
-    const C_GRIS    = [170, 170, 170];
-    const C_CORREC  = [46, 169, 106];
-    const C_WRONG   = [180, 83, 9];
-    const C_FBKG_C  = [10, 46, 26];
-    const C_FBKG_W  = [28, 16, 0];
-    const C_CARD    = [26, 26, 26];
-
-    const score = answers.filter((a, i) => a === shuffledQuestions[i].correct).length;
-    const pct   = Math.round(score / shuffledQuestions.length * 100);
-    const fecha = new Date().toLocaleDateString('es-DO', { day:'2-digit', month:'long', year:'numeric' });
-    const tiempoPDF = timerFinalStr;
-    const letters = ['A','B','C','D'];
-
-    // ────────────────────────────────────────────────────
-    //  UTILIDADES
-    // ────────────────────────────────────────────────────
-    let page = 1;
-    let y = 0;
-
-    function newPage() {
-      doc.addPage();
-      page++;
-      fillBg();
-      drawPageFooter();
-      y = MT;
+  cargarJsPDF(() => {
+    try {
+      const { jsPDF } = window.jspdf;
+      construirPDF(jsPDF);
+    } catch(e) {
+      console.error('Error generando PDF:', e);
+      alert('Error al generar el PDF: ' + e.message + '\n\nIntente recargar la página.');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '⬇ Descargar Informe PDF';
     }
+  });
+}
 
-    function fillBg() {
-      doc.setFillColor(...C_BG);
-      doc.rect(0, 0, PW, PH, 'F');
-    }
+function construirPDF(jsPDF) {
+  const doc  = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+  const PW   = 210, PH = 297;
+  const ML   = 14, MR = 14, MT = 16, MB = 16;
+  const CW   = PW - ML - MR;
 
-    function drawPageFooter() {
-      doc.setFillColor(...C_HEADER);
-      doc.rect(0, PH - 10, PW, 10, 'F');
-      doc.setDrawColor(...C_VERDE);
-      doc.setLineWidth(0.4);
-      doc.line(0, PH - 10, PW, PH - 10);
-      doc.setFontSize(7);
-      doc.setTextColor(...C_GRIS);
-      doc.setFont('helvetica', 'normal');
-      doc.text('Simulador ERP · Docente Técnico Profesional · MINERD', ML, PH - 4);
-      doc.text(`Pág. ${page}`, PW - MR, PH - 4, { align: 'right' });
-    }
+  // ── Paleta ────────────────────────────────────────────
+  const NEGRO   = [13,  13,  13 ];
+  const OSCURO  = [26,  26,  26 ];
+  const MEDIO   = [46,  46,  46 ];
+  const BLANCO  = [248, 245, 240];
+  const GRIS    = [160, 160, 160];
+  const GRIS2   = [100, 100, 100];
+  const VERDE   = [29,  185, 84 ];
+  const DORADO  = [201, 148, 58 ];
+  const CORREC  = [46,  169, 106];
+  const WRONG   = [200, 100, 20 ];
+  const CORREC_BG = [10, 40, 20];
+  const WRONG_BG  = [40, 20,  5];
 
-    function checkY(needed) {
-      if (y + needed > PH - MB - 10) { newPage(); }
-    }
+  const score    = answers.filter((a,i) => a === shuffledQuestions[i].correct).length;
+  const pct      = Math.round(score / shuffledQuestions.length * 100);
+  const total    = shuffledQuestions.length;
+  const fecha    = new Date().toLocaleDateString('es-DO',{day:'2-digit',month:'long',year:'numeric'});
+  const tiempo   = timerFinalStr;
+  const letters  = ['A','B','C','D'];
+  const PCTCOLOR = pct >= 75 ? CORREC : pct >= 60 ? DORADO : WRONG;
 
-    // Wrap text and return array of lines
-    function wrapText(txt, maxW, fontSize, fontStyle) {
-      doc.setFontSize(fontSize);
-      doc.setFont('helvetica', fontStyle || 'normal');
-      return doc.splitTextToSize(txt, maxW);
-    }
+  let pageNum = 0;
+  let y = MT;
 
-    // Draw a filled rounded-corner card background
-    function drawCard(cx, cy, cw, ch, fillColor, strokeColor) {
-      doc.setFillColor(...fillColor);
-      if (strokeColor) { doc.setDrawColor(...strokeColor); doc.setLineWidth(0.3); doc.roundedRect(cx, cy, cw, ch, 1.5, 1.5, 'FD'); }
-      else { doc.roundedRect(cx, cy, cw, ch, 1.5, 1.5, 'F'); }
-    }
+  // ── Helpers ───────────────────────────────────────────
+  const setFill   = c => doc.setFillColor(...c);
+  const setStroke = c => doc.setDrawColor(...c);
+  const setColor  = c => doc.setTextColor(...c);
+  const setFont   = (s,w) => doc.setFont('helvetica', w||'normal');
 
-    // ────────────────────────────────────────────────────
-    //  PÁGINA 1 — PORTADA
-    // ────────────────────────────────────────────────────
-    fillBg();
-    drawPageFooter();
+  function bg() {
+    setFill(NEGRO);
+    doc.rect(0, 0, PW, PH, 'F');
+  }
 
-    // Franja header
-    doc.setFillColor(...C_HEADER);
-    doc.rect(0, 0, PW, 55, 'F');
-    doc.setDrawColor(...C_VERDE);
-    doc.setLineWidth(1);
-    doc.line(0, 55, PW, 55);
+  function footer() {
+    setFill(OSCURO);
+    doc.rect(0, PH-9, PW, 9, 'F');
+    setStroke(VERDE); doc.setLineWidth(0.3);
+    doc.line(0, PH-9, PW, PH-9);
+    doc.setFontSize(6.5); setFont(); setColor(GRIS2);
+    doc.text('Simulador ERP · Docente Técnico Profesional · MINERD', ML, PH-3.5);
+    doc.text(`Página ${pageNum}`, PW-MR, PH-3.5, {align:'right'});
+  }
 
-    // Badge ERP
-    doc.setFillColor(...C_VERDE);
-    doc.roundedRect(ML, 10, 22, 10, 1.5, 1.5, 'F');
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(...C_BG);
-    doc.text('ERP', ML + 11, 17, { align: 'center' });
+  function addPage() {
+    doc.addPage(); pageNum++;
+    bg(); footer(); y = MT;
+  }
 
-    // Título
-    doc.setFontSize(16);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(...C_BLANCO);
-    doc.text('Informe de Resultados', ML + 28, 17);
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(...C_GRIS);
-    doc.text('EJERCICIO DE RENDIMIENTO PROFESIONAL · TÉCNICO PROFESIONAL', ML + 28, 23);
+  function wrap(txt, maxW, fs, fw) {
+    doc.setFontSize(fs);
+    doc.setFont('helvetica', fw||'normal');
+    return doc.splitTextToSize(txt, maxW);
+  }
 
-    // Subtítulo institución
-    doc.setFontSize(8);
-    doc.setTextColor(...C_GRIS);
-    doc.text('Ministerio de Educación de la República Dominicana', ML, 33);
-    doc.text(`Fecha: ${fecha}`, ML, 39);
-    doc.text(`Tiempo de realización: ${tiempoPDF}`, ML, 45);
+  function textH(lines, lh) { return lines.length * lh; }
 
-    // Tarjeta de puntaje
-    y = 65;
-    const pctColor = pct >= 75 ? C_CORREC : pct >= 60 ? C_DORADO : C_WRONG;
-    drawCard(ML, y, CW, 40, C_HEADER, C_VERDE);
-    doc.setFontSize(34);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(...pctColor);
-    doc.text(`${pct}%`, ML + CW / 2, y + 20, { align: 'center' });
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(...C_GRIS);
-    doc.text('PUNTUACIÓN FINAL', ML + CW / 2, y + 28, { align: 'center' });
+  function checkSpace(need) {
+    if (y + need > PH - MB - 9) addPage();
+  }
 
-    // Correctas / incorrectas
-    y += 48;
-    const colW = (CW - 6) / 2;
-    drawCard(ML, y, colW, 20, C_FBKG_C, C_CORREC);
-    doc.setFontSize(16); doc.setFont('helvetica', 'bold'); doc.setTextColor(...C_CORREC);
-    doc.text(`${score}`, ML + colW / 2, y + 10, { align: 'center' });
-    doc.setFontSize(7); doc.setFont('helvetica', 'normal'); doc.setTextColor(...C_GRIS);
-    doc.text('CORRECTAS', ML + colW / 2, y + 16, { align: 'center' });
+  function filledRect(x, ry, rw, rh, fill, stroke) {
+    setFill(fill);
+    doc.rect(x, ry, rw, rh, stroke ? 'FD' : 'F');
+    if (stroke) { setStroke(stroke); doc.setLineWidth(0.25); doc.rect(x, ry, rw, rh); }
+  }
 
-    const col2X = ML + colW + 6;
-    drawCard(col2X, y, colW, 20, C_FBKG_W, C_WRONG);
-    doc.setFontSize(16); doc.setFont('helvetica', 'bold'); doc.setTextColor(...C_WRONG);
-    doc.text(`${shuffledQuestions.length - score}`, col2X + colW / 2, y + 10, { align: 'center' });
-    doc.setFontSize(7); doc.setFont('helvetica', 'normal'); doc.setTextColor(...C_GRIS);
-    doc.text('INCORRECTAS', col2X + colW / 2, y + 16, { align: 'center' });
+  // ──────────────────────────────────────────────────────
+  //  PORTADA
+  // ──────────────────────────────────────────────────────
+  pageNum = 1; bg(); footer();
 
-    // Mensaje
-    y += 28;
-    let msg;
-    if      (pct >= 90) msg = 'Excelente desempeño profesional';
-    else if (pct >= 75) msg = 'Buen nivel de preparación';
-    else if (pct >= 60) msg = 'Preparación en progreso';
-    else                msg = 'Necesita más práctica';
-    doc.setFontSize(11); doc.setFont('helvetica', 'bold'); doc.setTextColor(...pctColor);
-    doc.text(msg, ML + CW / 2, y, { align: 'center' });
+  // Header strip
+  setFill(OSCURO); doc.rect(0, 0, PW, 50, 'F');
+  setStroke(VERDE); doc.setLineWidth(0.8); doc.line(0, 50, PW, 50);
 
-    // Documentos sustento
-    y += 10;
-    doc.setFontSize(7); doc.setFont('helvetica', 'italic'); doc.setTextColor(...C_GRIS);
-    const sustento = 'Sustentado en: Componente Académico Técnico Profesional y Artes · Estándares Profesionales y del Desempeño Docente · Ley 136-03 · Código de Ética Docente (OD 22/2023)';
-    const susLines = wrapText(sustento, CW, 7, 'italic');
-    susLines.forEach(l => { doc.text(l, ML + CW / 2, y, { align: 'center' }); y += 4; });
+  // Badge ERP
+  setFill(VERDE); doc.rect(ML, 9, 20, 9, 'F');
+  doc.setFontSize(9); doc.setFont('helvetica','bold'); setColor(NEGRO);
+  doc.text('ERP', ML+10, 15.5, {align:'center'});
 
-    // Separador
-    y += 4;
-    doc.setDrawColor(...C_VERDE);
-    doc.setLineWidth(0.4);
-    doc.line(ML, y, PW - MR, y);
+  // Título
+  doc.setFontSize(15); doc.setFont('helvetica','bold'); setColor(BLANCO);
+  doc.text('Informe de Resultados', ML+24, 15);
+  doc.setFontSize(7.5); doc.setFont('helvetica','normal'); setColor(GRIS);
+  doc.text('EJERCICIO DE RENDIMIENTO PROFESIONAL · TÉCNICO PROFESIONAL', ML+24, 21);
 
-    // Aviso siguiente sección
-    y += 8;
-    doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.setTextColor(...C_BLANCO);
-    doc.text('Detalle completo de los 50 casos', ML + CW / 2, y, { align: 'center' });
-    doc.setFontSize(7); doc.setFont('helvetica', 'normal'); doc.setTextColor(...C_GRIS);
-    y += 5;
-    doc.text('A continuación encontrará cada caso con la respuesta seleccionada, la respuesta correcta y su retroalimentación.', ML + CW / 2, y, { align: 'center' });
+  // Meta info
+  doc.setFontSize(7.5); setColor(GRIS);
+  doc.text('Ministerio de Educación de la República Dominicana', ML, 32);
+  doc.text(`Fecha: ${fecha}`, ML, 38);
+  doc.text(`Tiempo de realización: ${tiempo}`, ML, 44);
 
-    // ────────────────────────────────────────────────────
-    //  PÁGINAS 2+ — CASOS
-    // ────────────────────────────────────────────────────
-    newPage();
+  // Tarjeta puntaje
+  y = 58;
+  filledRect(ML, y, CW, 34, OSCURO); setStroke(VERDE); doc.setLineWidth(0.3); doc.rect(ML, y, CW, 34);
+  doc.setFontSize(30); doc.setFont('helvetica','bold'); setColor(PCTCOLOR);
+  doc.text(`${pct}%`, PW/2, y+19, {align:'center'});
+  doc.setFontSize(7); doc.setFont('helvetica','normal'); setColor(GRIS);
+  doc.text('PUNTUACIÓN FINAL', PW/2, y+27, {align:'center'});
 
-    shuffledQuestions.forEach((q, idx) => {
-      const userAns   = answers[idx];
-      const isCorrect = userAns === q.correct;
-      const cardColor = isCorrect ? C_FBKG_C : C_FBKG_W;
-      const accentCol = isCorrect ? C_CORREC  : C_WRONG;
+  // Correctas / Incorrectas / Tiempo
+  y += 41;
+  const bw = (CW-8)/3;
+  [
+    {val: String(score),   label:'CORRECTAS',   color:CORREC, bg:CORREC_BG},
+    {val: String(total-score), label:'INCORRECTAS', color:WRONG,  bg:WRONG_BG},
+    {val: tiempo,          label:'TIEMPO',      color:DORADO, bg:OSCURO},
+  ].forEach((item, i) => {
+    const bx = ML + i*(bw+4);
+    filledRect(bx, y, bw, 17, item.bg);
+    setStroke(item.color); doc.setLineWidth(0.25); doc.rect(bx, y, bw, 17);
+    doc.setFontSize(i===2?9:13); doc.setFont('helvetica','bold'); setColor(item.color);
+    doc.text(item.val, bx+bw/2, y+10, {align:'center'});
+    doc.setFontSize(6); doc.setFont('helvetica','normal'); setColor(GRIS);
+    doc.text(item.label, bx+bw/2, y+15, {align:'center'});
+  });
 
-      // ─ Estimación de altura total de la tarjeta ─
-      const numLines = wrapText(`CASO ${idx + 1} DE 50`, CW - 4, 7).length;
-      const qLines   = wrapText(q.text, CW - 4, 8.5, 'bold');
-      let optLinesTotal = 0;
-      q.options.forEach((opt, oi) => {
-        const prefix = `${letters[oi]}.  `;
-        optLinesTotal += wrapText(prefix + opt, CW - 12, 8).length;
-      });
-      const fbLines = wrapText(q.feedback, CW - 8, 7.5);
-      const dimLines = wrapText(q.dim + ' · ' + q.area, CW - 4, 6.5).length;
+  // Mensaje
+  y += 23;
+  const msgs = ['','Excelente desempeño profesional','Buen nivel de preparación','Preparación en progreso','Necesita más práctica'];
+  const mIdx = pct>=90?1:pct>=75?2:pct>=60?3:4;
+  doc.setFontSize(11); doc.setFont('helvetica','bold'); setColor(PCTCOLOR);
+  doc.text(msgs[mIdx], PW/2, y, {align:'center'});
 
-      const estimH = 6 + (qLines.length * 5) + 3 + (optLinesTotal * 4.5) + 7 + (fbLines.length * 4.5) + 8 + dimLines * 4;
-      checkY(estimH);
+  // Sustento
+  y += 7;
+  const sus = wrap('Sustentado en: Componente Académico Técnico Profesional y Artes · Estándares Profesionales y del Desempeño Docente · Ley 136-03 · Código de Ética Docente (OD 22/2023)', CW, 6.5, 'italic');
+  setColor(GRIS2); sus.forEach(l => { doc.text(l, PW/2, y, {align:'center'}); y+=4; });
 
-      const cardTop = y;
+  // Separador
+  y += 3;
+  setStroke(VERDE); doc.setLineWidth(0.3); doc.line(ML, y, PW-MR, y);
+  y += 6;
+  doc.setFontSize(8.5); doc.setFont('helvetica','bold'); setColor(BLANCO);
+  doc.text('Detalle completo de los 50 casos respondidos', PW/2, y, {align:'center'});
+  y += 4;
+  doc.setFontSize(6.5); doc.setFont('helvetica','normal'); setColor(GRIS);
+  doc.text('Cada caso muestra la respuesta seleccionada, la respuesta correcta y su retroalimentación normativa.', PW/2, y, {align:'center'});
 
-      // ─ Número de caso y estado ─
-      doc.setFontSize(7); doc.setFont('helvetica', 'bold');
-      doc.setTextColor(...accentCol);
-      doc.text(`CASO ${idx + 1} DE 50`, ML, y + 5);
+  // ──────────────────────────────────────────────────────
+  //  CASOS
+  // ──────────────────────────────────────────────────────
+  addPage();
 
-      const estado = isCorrect ? '✓  CORRECTA' : '✗  INCORRECTA';
-      doc.setTextColor(...accentCol);
-      doc.text(estado, PW - MR, y + 5, { align: 'right' });
+  shuffledQuestions.forEach((q, idx) => {
+    const userAns   = answers[idx];
+    const isOk      = userAns === q.correct;
+    const ACCENT    = isOk ? CORREC : WRONG;
+    const FB_BG     = isOk ? CORREC_BG : WRONG_BG;
+    const LH_Q  = 4.8, LH_O = 4.3, LH_F = 4.2;
 
-      y += 7;
+    // Medir altura total
+    const qLines  = wrap(q.text, CW-4, 8.5, 'bold');
+    let optH = 0;
+    q.options.forEach((opt,oi) => {
+      const L = wrap(`${letters[oi]}.  ${opt}`, CW-11, 7.8);
+      optH += L.length*LH_O + 3;
+    });
+    const fbLines = wrap(q.feedback, CW-6, 7.2);
+    const total_h = 7 + qLines.length*LH_Q + 2 + optH + 2 + 6 + fbLines.length*LH_F + 5 + 4 + 4;
+    checkSpace(Math.min(total_h, 60)); // si cabe todo junto, mejor; sino se paginará
 
-      // ─ Pregunta ─
-      doc.setFontSize(8.5); doc.setFont('helvetica', 'bold');
-      doc.setTextColor(...C_BLANCO);
-      qLines.forEach(l => { doc.text(l, ML, y); y += 5; });
-      y += 2;
+    // ── Cabecera del caso ──
+    const hBg = isOk ? CORREC_BG : WRONG_BG;
+    filledRect(ML, y, CW, 6.5, hBg);
+    setStroke(ACCENT); doc.setLineWidth(0.25); doc.rect(ML, y, CW, 6.5);
+    doc.setFontSize(6.5); doc.setFont('helvetica','bold'); setColor(ACCENT);
+    doc.text(`CASO ${idx+1} DE ${total}`, ML+2, y+4.5);
+    doc.text(isOk ? '✓  CORRECTA' : '✗  INCORRECTA', PW-MR-2, y+4.5, {align:'right'});
+    y += 7.5;
 
-      // ─ Opciones ─
-      q.options.forEach((opt, oi) => {
-        const isUser = oi === userAns;
-        const isCor  = oi === q.correct;
+    // ── Pregunta ──
+    checkSpace(qLines.length*LH_Q + 2);
+    doc.setFontSize(8.5); doc.setFont('helvetica','bold'); setColor(BLANCO);
+    qLines.forEach(l => { doc.text(l, ML, y); y += LH_Q; });
+    y += 2;
 
-        let bgOpt = null, txtOpt = C_GRIS, borderOpt = null;
-        if (isCor)       { bgOpt = C_FBKG_C; txtOpt = C_CORREC; borderOpt = C_CORREC; }
-        else if (isUser) { bgOpt = C_FBKG_W; txtOpt = C_WRONG;  borderOpt = C_WRONG;  }
+    // ── Opciones ──
+    q.options.forEach((opt, oi) => {
+      const isUser = oi === userAns;
+      const isCor  = oi === q.correct;
+      const optLines = wrap(opt, CW-11, 7.8);
+      const oh = optLines.length * LH_O + 3;
 
-        const prefix = `${letters[oi]}.`;
-        const optText = opt;
-        const fullLines = wrapText(prefix + '  ' + optText, CW - 12, 8);
-        const optH = (fullLines.length * 4.5) + 3;
+      checkSpace(oh + 1);
 
-        if (bgOpt) {
-          doc.setFillColor(...bgOpt);
-          doc.setDrawColor(...borderOpt);
-          doc.setLineWidth(0.25);
-          doc.roundedRect(ML, y - 1, CW, optH, 1, 1, 'FD');
-        }
+      // Fondo opción
+      let obg = OSCURO, oCol = GRIS, oBorder = null;
+      if (isCor)       { obg = CORREC_BG; oCol = CORREC; oBorder = CORREC; }
+      else if (isUser) { obg = WRONG_BG;  oCol = WRONG;  oBorder = WRONG;  }
 
-        // Letra en círculo
-        doc.setFillColor(bgOpt ? borderOpt : [58, 58, 58]);
-        doc.circle(ML + 4, y + 2.5, 2.5, 'F');
-        doc.setFontSize(7); doc.setFont('helvetica', 'bold');
-        doc.setTextColor(bgOpt ? C_BG : [170, 170, 170]);
-        doc.text(letters[oi], ML + 4, y + 3.8, { align: 'center' });
+      filledRect(ML, y, CW, oh, obg, oBorder);
 
-        // Texto opción
-        doc.setFontSize(8); doc.setFont('helvetica', isUser || isCor ? 'bold' : 'normal');
-        doc.setTextColor(...txtOpt);
-        const textLines = doc.splitTextToSize(optText, CW - 12);
-        textLines.forEach((tl, ti) => { doc.text(tl, ML + 9, y + 3 + ti * 4.5); });
+      // Círculo letra
+      const cx = ML+4, cy = y + oh/2;
+      setFill(oBorder || MEDIO); doc.circle(cx, cy, 2.3, 'F');
+      doc.setFontSize(6.5); doc.setFont('helvetica','bold');
+      setColor(obg === OSCURO ? GRIS : NEGRO);
+      doc.text(letters[oi], cx, cy+0.9, {align:'center'});
 
-        // Indicador al final
-        if (isUser && !isCor) {
-          doc.setFontSize(7); doc.setFont('helvetica', 'bold'); doc.setTextColor(...C_WRONG);
-          doc.text('← Tu respuesta', PW - MR, y + 3, { align: 'right' });
-        }
-        if (isCor) {
-          doc.setFontSize(7); doc.setFont('helvetica', 'bold'); doc.setTextColor(...C_CORREC);
-          const label = (isUser && isCor) ? '← Tu respuesta ✓' : '← Correcta';
-          doc.text(label, PW - MR, y + 3, { align: 'right' });
-        }
+      // Texto opción
+      doc.setFontSize(7.8); doc.setFont('helvetica', isUser||isCor ? 'bold' : 'normal');
+      setColor(oCol);
+      optLines.forEach((ol, li) => { doc.text(ol, ML+9, y+3.5+li*LH_O); });
 
-        y += optH + 1.5;
-      });
+      // Etiqueta derecha
+      if (isCor || isUser) {
+        const tag = (isUser && isCor) ? '← Tu respuesta ✓' : isCor ? '← Correcta' : '← Tu respuesta';
+        doc.setFontSize(6.2); doc.setFont('helvetica','bold'); setColor(isCor ? CORREC : WRONG);
+        doc.text(tag, PW-MR-1, y+3.5, {align:'right'});
+      }
 
-      y += 2;
-
-      // ─ Retroalimentación ─
-      const fbH = (fbLines.length * 4.5) + 6;
-      doc.setFillColor(...cardColor);
-      doc.setDrawColor(...accentCol);
-      doc.setLineWidth(0.3);
-      doc.roundedRect(ML, y, CW, fbH, 1.5, 1.5, 'FD');
-
-      // Etiqueta
-      doc.setFillColor(...accentCol);
-      doc.roundedRect(ML + 2, y + 1.5, 28, 4.5, 1, 1, 'F');
-      doc.setFontSize(6.5); doc.setFont('helvetica', 'bold'); doc.setTextColor(...C_BG);
-      doc.text('RETROALIMENTACIÓN', ML + 16, y + 4.5, { align: 'center' });
-
-      // Texto feedback
-      doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
-      doc.setTextColor(isCorrect ? [124, 255, 193] : [251, 191, 36]);
-      fbLines.forEach((fl, fi) => { doc.text(fl, ML + 3, y + 9 + fi * 4.5); });
-      y += fbH + 2;
-
-      // ─ Área / Dimensión ─
-      doc.setFontSize(6.5); doc.setFont('helvetica', 'italic'); doc.setTextColor(...C_GRIS);
-      doc.text(`${q.dim}  ·  ${q.area}`, ML, y);
-      y += 4;
-
-      // ─ Separador entre casos ─
-      doc.setDrawColor(50, 50, 50);
-      doc.setLineWidth(0.2);
-      doc.line(ML, y, PW - MR, y);
-      y += 5;
+      y += oh + 1.5;
     });
 
-    // ────────────────────────────────────────────────────
-    //  GUARDAR
-    // ────────────────────────────────────────────────────
-    doc.save(`Informe_ERP_${fecha.replace(/\s/g,'_').replace(/,/g,'')}.pdf`);
+    y += 2;
 
-  } catch(e) {
-    console.error('Error generando PDF:', e);
-    alert('Ocurrió un error al generar el PDF. Por favor recarga la página e intenta nuevamente.');
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = '⬇ Descargar Informe PDF';
-  }
+    // ── Retroalimentación ──
+    const fbH = fbLines.length * LH_F + 9;
+    checkSpace(fbH + 2);
+    filledRect(ML, y, CW, fbH, FB_BG, ACCENT);
+
+    // Etiqueta interna
+    setFill(ACCENT); doc.rect(ML+2, y+1.5, 32, 4, 'F');
+    doc.setFontSize(6); doc.setFont('helvetica','bold'); setColor(NEGRO);
+    doc.text('RETROALIMENTACIÓN', ML+18, y+4.5, {align:'center'});
+
+    doc.setFontSize(7.2); doc.setFont('helvetica','normal');
+    setColor(isOk ? [180,255,210] : [255,210,140]);
+    fbLines.forEach((fl,fi) => { doc.text(fl, ML+2.5, y+8+fi*LH_F); });
+    y += fbH + 2;
+
+    // ── Dimensión y área ──
+    checkSpace(5);
+    doc.setFontSize(6.2); doc.setFont('helvetica','italic'); setColor(GRIS2);
+    doc.text(`${q.dim}  ·  ${q.area}`, ML, y);
+    y += 4;
+
+    // ── Separador ──
+    checkSpace(5);
+    setStroke(MEDIO); doc.setLineWidth(0.15); doc.line(ML, y, PW-MR, y);
+    y += 5;
+  });
+
+  // ── Guardar ──
+  doc.save(`Informe_ERP_${fecha.replace(/\s/g,'_').replace(/,/g,'')}.pdf`);
 }
 </script>
 </body>
