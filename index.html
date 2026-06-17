@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulador ERP – Práctica Docente</title>
+<title>Simulador ERP - Nivel Primario</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -31,13 +31,30 @@
 
   .dimension-tag { display: inline-block; font-size: 0.65rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 0.28rem 0.75rem; border-radius: 2px; margin-bottom: 1rem; }
   .dim-planificacion { background: #1A3D6E; color: #8ec6ff; }
-  .dim-gestion       { background: #1A5C3A; color: #7effc1; }
+  .dim-gestion       { background: #2C5688; color: #aacef5; }
   .dim-profesional   { background: #3D2800; color: #ffcc70; }
 
   .question-card { background: var(--gris-oscuro); border: 1px solid #333; border-left: 4px solid var(--verde); border-radius: 4px; padding: 2rem 2.2rem 1.8rem; margin-bottom: 1.8rem; animation: fadeIn 0.35s ease; }
   @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
   .question-number { font-size: 0.7rem; color: var(--verde); font-weight: 600; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 0.6rem; }
   .question-text { font-size: 1.05rem; line-height: 1.65; }
+  /* Colores de anclaje para lectura rápida (suaves) */
+  .ak-q { color: #E8C07D; font-weight: 600; }   /* pregunta / verbo rector */
+  .ak-p { color: #EFA5A5; font-weight: 600; }   /* disparador / problema central */
+  .ak-c { color: #8FD0AE; font-weight: 600; }   /* condición específica */
+  .ak-m { color: #AFBDEC; font-weight: 600; }   /* momento del proceso */
+  /* Guía de portada */
+  .guia { max-width: 660px; margin: 0 auto 2rem; text-align: left; background: var(--gris-oscuro); border: 1px solid #333; border-left: 4px solid var(--verde); border-radius: 6px; padding: 1.5rem 1.7rem; }
+  .guia-title { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem; }
+  .guia-intro { font-size: 0.85rem !important; color: #9a9a9a !important; line-height: 1.55 !important; margin: 0 0 1rem !important; max-width: none !important; text-align: left !important; }
+  .guia-anchor { font-size: 0.88rem; line-height: 1.55; color: #c9c9c9; margin-bottom: 0.7rem; }
+  .guia-anchor .ak-q, .guia-anchor .ak-p, .guia-anchor .ak-c, .guia-anchor .ak-m, .guia-badge { font-weight: 700; }
+  .guia-badge { color: #9fb4cf; }
+  .guia-sub { font-size: 0.85rem; line-height: 1.55; color: #c8b78f; border-top: 1px solid #2e2e2e; padding-top: 0.9rem; margin-top: 0.5rem; }
+  .guia-elim-title { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px; color: #888; margin: 0.95rem 0 0.45rem; }
+  .guia-elim { list-style: none; padding: 0; margin: 0; }
+  .guia-elim li { font-size: 0.83rem; line-height: 1.5; color: #b0b0b0; padding-left: 1rem; position: relative; margin-bottom: 0.35rem; }
+  .guia-elim li::before { content: '✕'; position: absolute; left: 0; color: #EFA5A5; font-size: 0.7rem; top: 0.15rem; }
   .area-tag { display: inline-block; margin-top: 0.9rem; font-size: 0.65rem; color: #888; letter-spacing: 1px; text-transform: uppercase; border-top: 1px solid #333; padding-top: 0.55rem; width: 100%; }
 
   .options-grid { display: grid; gap: 0.75rem; margin-bottom: 1.5rem; }
@@ -45,8 +62,8 @@
   .option-btn:hover:not(:disabled) { border-color: var(--dorado); color: var(--blanco); background: #333; }
   .option-letter { width: 2rem; height: 2rem; border-radius: 50%; background: #3a3a3a; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; color: #aaa; flex-shrink: 0; transition: all 0.2s; }
   .option-btn:hover:not(:disabled) .option-letter { background: var(--dorado); color: #000; }
-  .option-btn.correct { border-color: #2ea96a; background: #0a2e1a; color: #7effc1; }
-  .option-btn.correct .option-letter { background: #2ea96a; color: #000; }
+  .option-btn.correct { border-color: #3E6DA3; background: #0e2740; color: #aacef5; }
+  .option-btn.correct .option-letter { background: #3E6DA3; color: #fff; }
   .option-btn.wrong { border-color: #B45309; background: #1c1000; color: #fbbf24; }
   .option-btn.wrong .option-letter { background: #B45309; color: #fff; }
   .option-btn.neutral-disabled { opacity: 0.4; }
@@ -54,7 +71,7 @@
   .check-icon { font-size: 1.1rem; }
 
   .feedback-box { border-radius: 4px; padding: 1.1rem 1.3rem; margin-bottom: 1.5rem; font-size: 0.88rem; line-height: 1.6; display: none; animation: fadeIn 0.3s ease; }
-  .feedback-box.correct-fb { background: #0a2e1a; border: 1px solid #2ea96a; color: #7effc1; display: block; }
+  .feedback-box.correct-fb { background: #0e2740; border: 1px solid #3E6DA3; color: #aacef5; display: block; }
   .feedback-box.wrong-fb   { background: #1c1000; border: 1px solid #B45309; color: #fbbf24; display: block; }
   .feedback-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 1px; }
 
@@ -67,14 +84,14 @@
   .q-counter { font-size: 0.8rem; color: #666; text-align: center; flex: 1; }
 
   #results-screen { display: none; text-align: center; padding: 3rem 1rem; animation: fadeIn 0.5s ease; }
-  .result-badge { font-family: 'Playfair Display', serif; font-size: 5rem; font-weight: 900; color: var(--dorado); line-height: 1; }
+  .result-badge { font-family: 'Playfair Display', serif; font-size: 3rem; font-weight: 900; color: var(--dorado); line-height: 1; }
   .result-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 3px; color: #888; margin-top: 0.5rem; margin-bottom: 2rem; }
   .result-msg { font-size: 1.2rem; font-family: 'Playfair Display', serif; margin-bottom: 0.5rem; }
   .result-sub { font-size: 0.9rem; color: #999; margin-bottom: 2.5rem; max-width: 480px; margin-left: auto; margin-right: auto; line-height: 1.6; }
   .result-breakdown { display: flex; justify-content: center; gap: 2rem; margin-bottom: 2.5rem; }
   .rb-item { text-align: center; }
   .rb-num { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 700; line-height: 1; }
-  .rb-num.green { color: #2ea96a; } .rb-num.red { color: #f59e0b; }
+  .rb-num.green { color: #3E6DA3; } .rb-num.red { color: #f59e0b; }
   .rb-label { font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: #666; margin-top: 4px; }
   .btn-restart { background: var(--verde); color: #fff; border: none; padding: 0.9rem 2.5rem; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; border-radius: 3px; transition: background 0.2s; }
   .btn-restart:hover { background: #335C8A; }
@@ -98,9 +115,9 @@
   .timer-label { font-size: 0.58rem; letter-spacing: 2px; text-transform: uppercase; color: #555; font-weight: 600; }
   .timer-display { font-family: 'Courier New', monospace; font-size: 1.25rem; font-weight: 700; color: var(--dorado); letter-spacing: 2px; line-height: 1; transition: color 0.4s; }
   .timer-display.running { color: var(--dorado); }
-  .timer-display.stopped { color: #2ea96a; }
+  .timer-display.stopped { color: #3E6DA3; }
   .timer-dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--dorado); margin-bottom: 1px; animation: pulse 1s infinite; }
-  .timer-dot.stopped { background: #2ea96a; animation: none; }
+  .timer-dot.stopped { background: #3E6DA3; animation: none; }
   .timer-dot.urgent  { background: #e04040; animation: pulse-urgent 0.5s infinite; }
   .timer-display.urgent { color: #e04040; }
   @keyframes pulse { 0%,100%{ opacity:1; } 50%{ opacity:0.2; } }
@@ -136,7 +153,7 @@
   .area-row-bar-inner { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
   .area-row-score { font-size: 0.68rem; font-weight: 600; min-width: 2.8rem; text-align: right; flex-shrink: 0; }
 
-  .pct-green  { color: #2ea96a; } .bar-green  { background: #2ea96a; }
+  .pct-green  { color: #3E6DA3; } .bar-green  { background: #3E6DA3; }
   .pct-yellow { color: #C9943A; } .bar-yellow { background: #C9943A; }
   .pct-red    { color: #f59e0b; } .bar-red    { background: #f59e0b; }
 
@@ -145,7 +162,7 @@
   .res-priority-title::before, .res-priority-title::after { content: ''; flex: 1; height: 1px; background: #2a2a2a; }
   .priority-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
   .priority-chip { font-size: 0.72rem; padding: 0.3rem 0.75rem; border-radius: 2px; border: 1px solid #B45309; background: #1c1000; color: #fbbf24; }
-  .priority-chip.ok { border-color: #1a5c3a; background: #0a2e1a; color: #7effc1; }
+  .priority-chip.ok { border-color: #2C5688; background: #0e2740; color: #aacef5; }
 
   #intro-screen { text-align: center; padding: 3rem 1rem; animation: fadeIn 0.5s ease; }
   #intro-screen h2 { font-family: 'Playfair Display', serif; font-size: 2.4rem; line-height: 1.2; margin-bottom: 1rem; }
@@ -240,8 +257,8 @@
   .nav-panel {
     width: 30%;
     flex-shrink: 0;
-    background: #0d1f0e;
-    border-right: 2px solid #1e4a20;
+    background: #0d1722;
+    border-right: 2px solid #1e3a55;
     padding: 0.8rem 0.7rem;
     display: flex;
     flex-wrap: wrap;
@@ -254,7 +271,7 @@
     box-sizing: border-box;
   }
   .nav-panel::-webkit-scrollbar { width: 3px; }
-  .nav-panel::-webkit-scrollbar-thumb { background: #2a4a2a; border-radius: 2px; }
+  .nav-panel::-webkit-scrollbar-thumb { background: #2a3f55; border-radius: 2px; }
 
   .nav-panel-title {
     width: 100%;
@@ -262,7 +279,7 @@
     font-weight: 700;
     letter-spacing: 2px;
     text-transform: uppercase;
-    color: #5a9a5a;
+    color: #5a82a9;
     margin-bottom: 0.3rem;
   }
 
@@ -303,17 +320,17 @@
 
   /* SIN RESPONDER — verde oscuro, texto blanco */
   .q-btn.unanswered {
-    background: #1a4a1a;
-    color: #d4f5d4;
+    background: #16324d;
+    color: #d4e4f5;
   }
-  .q-btn.unanswered:hover { background: #245c24; transform: scale(1.05); }
+  .q-btn.unanswered:hover { background: #1f4368; transform: scale(1.05); }
 
   /* YA RESPONDIDA — verde claro, texto blanco */
   .q-btn.answered {
-    background: #4caf50;
+    background: #3E6DA3;
     color: #ffffff;
   }
-  .q-btn.answered:hover { background: #43a047; }
+  .q-btn.answered:hover { background: #335C8A; }
 
   /* PREGUNTA ACTUAL — gris oscuro, texto blanco, borde blanco */
   .q-btn.current {
@@ -342,7 +359,7 @@
       height: auto;
       max-height: none;
       border-right: none;
-      border-bottom: 2px solid #1e4a20;
+      border-bottom: 2px solid #1e3a55;
       padding: 0.6rem 0.8rem 0.7rem;
       flex-direction: row;
       flex-wrap: wrap;
@@ -361,8 +378,8 @@
 <body>
 
 <header>
-  <div class="logo-badge">ERP</div>
-  <h1>Simulador de Práctica
+  <div class="logo-badge">ERP 5</div>
+  <h1>Simulador de Práctica · Nivel Primario
     <span>Ejercicio de Rendimiento Profesional · Práctica Docente</span>
   </h1>
   <div class="progress-area">
@@ -378,72 +395,28 @@
 
 <main>
   <div id="intro-screen">
-    <h2>Practica para la prueba <span>ERP 2025-2026</span></h2>
-    <p>Este simulador contiene 40 casos reales basados en situaciones pedagógicas del contexto educativo dominicano. Cada caso evalúa competencias de planificación pedagógica y gestión del aprendizaje. Las opciones se presentan en orden aleatorio en cada intento.</p>
-    <p class="intro-sustento">Esta práctica está orientada al Ejercicio de Rendimiento Profesional (ERP) del MINERD. Evalúa competencias de <em>Planificación Pedagógica</em> y <em>Gestión del Aprendizaje</em> en el marco de los Estándares Profesionales y del Desempeño Docente.</p>
-    <div class="intro-grid">
+    <h2>Simulador &middot; Nivel Primario <span>ERP 2025-2026</span></h2>
+    <p>Práctica orientada al <em>Ejercicio de Rendimiento Profesional (ERP)</em> del MINERD: 40 casos sobre Planificación Pedagógica y Gestión del Aprendizaje. Se puntúa sobre 20 (0.5 por caso) y las opciones se barajan en cada intento.</p>
 
-      <!-- Card 1: 40 casos -->
-      <div class="intro-card">
-        <div class="intro-card-num">40</div>
-        <div class="intro-card-label">Casos de estudio</div>
-      </div>
-
-      <!-- Card 2: 4 Dimensiones (desplegable) -->
-      <div class="intro-card has-dropdown" onclick="toggleCard(this)">
-        <div class="intro-card-header">
-          <div>
-            <div class="intro-card-num">4</div>
-            <div class="intro-card-label">Dimensiones evaluadas</div>
-          </div>
-          <span class="intro-card-arrow">▼</span>
-        </div>
-        <div class="intro-dropdown">
-          <div class="intro-dropdown-inner">
-            <div class="dropdown-section">
-              <div class="dropdown-section-title">Dimensiones</div>
-              <div class="dropdown-item"><span class="dropdown-dot"></span><span>El estudiante y su aprendizaje</span></div>
-              <div class="dropdown-item"><span class="dropdown-dot"></span><span>Contenido curricular</span></div>
-              <div class="dropdown-item"><span class="dropdown-dot"></span><span>Proceso de enseñanza y aprendizaje</span></div>
-              <div class="dropdown-item"><span class="dropdown-dot"></span><span>Compromiso personal y profesional</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 3: 8 Áreas (desplegable) -->
-      <div class="intro-card has-dropdown" onclick="toggleCard(this)">
-        <div class="intro-card-header">
-          <div>
-            <div class="intro-card-num">8</div>
-            <div class="intro-card-label">Áreas de desempeño</div>
-          </div>
-          <span class="intro-card-arrow">▼</span>
-        </div>
-        <div class="intro-dropdown">
-          <div class="intro-dropdown-inner">
-            <div class="dropdown-section">
-              <div class="dropdown-section-title">Áreas evaluadas</div>
-              <div class="dropdown-item"><span class="dropdown-num">1.</span><span>Nivel de formación académica</span></div>
-              <div class="dropdown-item"><span class="dropdown-num">2.</span><span>Aplicación del currículo</span></div>
-              <div class="dropdown-item"><span class="dropdown-num">3.</span><span>Resultados de aprendizaje de los estudiantes</span></div>
-              <div class="dropdown-item"><span class="dropdown-num">4.</span><span>Cumplimiento de normas institucionales</span></div>
-              <div class="dropdown-item"><span class="dropdown-num">5.</span><span>Relaciones con estudiantes, colegas y comunidad</span></div>
-              <div class="dropdown-item"><span class="dropdown-num">6.</span><span>Liderazgo en el trabajo</span></div>
-              <div class="dropdown-item"><span class="dropdown-num">7.</span><span>Formación continua</span></div>
-              <div class="dropdown-item"><span class="dropdown-num">8.</span><span>Trabajo en equipo</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 4: aleatorio -->
-      <div class="intro-card">
-        <div class="intro-card-num">✓</div>
-        <div class="intro-card-label">Posición aleatoria de respuestas</div>
-      </div>
-
+    <div class="guia">
+      <div class="guia-title">Guía de lectura rápida &middot; 5 anclajes</div>
+      <p class="guia-intro">No necesitas leer todo el caso. Localiza estos cinco elementos &mdash;en cada caso aparecen resaltados con su color&mdash; y decide con precisión:</p>
+      <div class="guia-anchor"><span class="ak-q">1 &middot; La pregunta y su verbo rector</span> &mdash; qué te piden hacer (evaluar, retroalimentar, planificar, adaptar, integrar&hellip;). Está en la última oración; léela primero.</div>
+      <div class="guia-anchor"><span class="ak-p">2 &middot; El disparador o problema central</span> &mdash; la dificultad concreta: ritmos diversos, vacíos previos, conflicto, memorización sin comprensión&hellip;</div>
+      <div class="guia-anchor"><span class="ak-c">3 &middot; La condición específica</span> &mdash; NEE o contexto: discapacidad visual o auditiva, dislexia, discalculia, sobreedad, zona rural sin conectividad&hellip;</div>
+      <div class="guia-anchor"><span class="ak-m">4 &middot; El momento del proceso</span> &mdash; inicio &rarr; diagnóstica &middot; durante &rarr; formativa &middot; cierre &rarr; sumativa.</div>
+      <div class="guia-anchor"><span class="guia-badge">5 &middot; La dimensión / área</span> &mdash; aparece en la etiqueta de cada caso; orienta la familia de la respuesta.</div>
+      <div class="guia-sub">La respuesta correcta casi siempre: modela y da andamiaje, ofrece apoyos diferenciados, construye comprensión (no memorización), da rol activo al estudiante y es formativa.</div>
+      <div class="guia-elim-title">Descarta rápido los distractores</div>
+      <ul class="guia-elim">
+        <li>&laquo;Lo mismo para todos / plantilla fija&raquo; &rarr; ignora la diversidad.</li>
+        <li>&laquo;Que trabajen solos sin guía&raquo; &rarr; falta de andamiaje.</li>
+        <li>&laquo;El compañero o el docente lo hace por él&raquo; &rarr; fomenta dependencia.</li>
+        <li>&laquo;Señalar el error y poner la nota&raquo; &rarr; no es formativa.</li>
+        <li>&laquo;Más tiempo sin cambiar la estrategia / memorizar definiciones&raquo; &rarr; no ataca la causa.</li>
+      </ul>
     </div>
+
     <button class="btn-start" onclick="startQuiz()">Iniciar Simulador</button>
   </div>
 
@@ -513,570 +486,565 @@
    ========================================================= */
 const rawQuestions = [
 
-  // ── CASOS REALES DE LAS FOTOS (1-16) ─────────────────
-
-  // CASO 1 — Ítem 1 de 40 (foto: geografía, meridianos)
-  {
-    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
-    area:"Área 3: Resultados de aprendizaje de los estudiantes",
-    text:"Durante una clase de geografía, un estudiante presenta dificultades para diferenciar los conceptos de meridianos, paralelos y husos horarios. Tiende a memorizar las definiciones, pero no logra explicar su función ni utilizarlas para ubicar lugares en el mapa ni interpretar diferencias horarias entre países. Además, confunde los términos al trabajar con planisferios o globos terráqueos, lo que limita la transferencia de lo aprendido a situaciones prácticas. ¿Cómo podría el docente apoyar la construcción de significado de estos conceptos y su uso funcional en actividades de ubicación espacial y comprensión del tiempo geográfico?",
-    options:[
-      "Trabajar los conceptos usando ejemplos puntuales del Ecuador y del meridiano de Greenwich para ubicar lugares en el mapa y profundizar en la función de los términos.",
-      "Explicar los términos con apoyo del mapa, globos terráqueos y otros recursos visuales, promoviendo actividades de ubicación y comparación para que comprendan su significado, uso y función.",
-      "Solicitar que consulte los términos en el diccionario y elabore un pequeño glosario personal para tener las definiciones a mano cuando surjan dudas durante las actividades.",
-      "Realizar correcciones inmediatas cada vez que confunda los términos, repitiendo las definiciones para reforzar su memorización y el uso correcto del vocabulario."
-    ], correct:1,
-    feedback:"La opción correcta propone el uso de recursos concretos y manipulativos (mapas, globos terráqueos) combinados con actividades de aplicación (ubicación y comparación). Esto promueve la comprensión funcional y la transferencia del aprendizaje, superando la memorización superficial. Las otras opciones se centran en estrategias que refuerzan la memorización sin abordar el problema de comprensión y transferencia que describe el caso."
-  },
-
-  // CASO 2 — Ítem 2 de 40 (foto: ABP ciencias)
+  // CASO 1
   {
     dim:"Planificación Pedagógica", dimClass:"dim-planificacion",
     area:"Área 2: Aplicación del currículo",
-    text:"Tras implementar el Aprendizaje Basado en Proyectos (ABP) en la clase de ciencias, el docente desea determinar si la estrategia ha sido efectiva. Observa productos finales variados, pero le interesa valorar no solo el resultado, sino también los procesos de investigación, la colaboración, la aplicación de conocimientos científicos y el desarrollo de competencias como la resolución de problemas y la comunicación. ¿Qué enfoque de evaluación permitiría valorar de manera más pertinente la efectividad del ABP en términos de aprendizajes y desarrollo de competencias?",
+    text:"En una escuela primaria de una <span class='ak-c'>comunidad rural donde la electricidad es intermitente y casi no hay conexión a internet</span>, una maestra de cuarto grado planifica sus clases. <span class='ak-p'>La mayoría de sus estudiantes no tiene computadora ni teléfono con datos en casa</span>, y la escuela solo dispone de unas pocas tabletas que se comparten entre todos los grados. Varias de las actividades que había pensado —buscar información en internet, ver videos y usar aplicaciones— requieren conexión, de modo que muchos niños no logran realizarlas y se atrasan respecto a sus compañeros. La maestra quiere sostener los aprendizajes sin que ningún niño quede excluido por no tener recursos en casa. La escuela atiende a familias de agricultores y muchos niños caminan largos trayectos para llegar; algunos llegan cansados y con pocas horas de estudio en casa. La maestra sabe que en el Nivel Primario los primeros aprendizajes son decisivos y que una actividad bien pensada con recursos sencillos puede ser tan valiosa como una digital. Quiere que su planificación responda a la realidad de la comunidad y no a un escenario ideal. <span class='ak-q'>¿Qué estrategia de planificación permitiría ajustar las actividades a estas condiciones y garantizar oportunidades de aprendizaje equitativas?</span>",
     options:[
-      "Valorar principalmente el producto final del proyecto con una rúbrica de presentación, priorizando la calidad del informe o maqueta como evidencia del aprendizaje logrado.",
-      "Implementar una evaluación auténtica que integre evidencias de proceso y de producto, alineadas con las competencias, con retroalimentación durante el proyecto.",
-      "Solicitar informes individuales al cierre del proyecto para verificar la comprensión de conceptos, dejando la valoración del trabajo en equipo como un criterio secundario no sistematizado.",
-      "Aplicar una prueba escrita estandarizada al finalizar el proyecto para comparar resultados entre estudiantes, centrando la valoración en los contenidos científicos abordados durante la unidad."
-    ], correct:1,
-    feedback:"La evaluación auténtica que integra evidencias de proceso y producto, alineadas con las competencias y con retroalimentación continua, es la más coherente con la filosofía del ABP. Valorar solo el producto final, los informes individuales o una prueba escrita estandarizada no captura la riqueza del proceso que el docente quiere evaluar: investigación, colaboración, resolución de problemas y comunicación."
-  },
-
-  // CASO 3 — Ítem 3 (foto: diversidad ritmos, planificación)
-  {
-    dim:"Planificación Pedagógica", dimClass:"dim-planificacion",
-    area:"Área 2: Aplicación del currículo",
-    text:"Durante el desarrollo de una unidad, el docente observa que algunos estudiantes comprenden rápidamente los contenidos y exigen mayores desafíos, mientras que otros requieren más tiempo, apoyos concretos y andamiaje para avanzar. Mantener una única secuencia y ritmo de trabajo ha generado desmotivación en ambos grupos. ¿Cómo debería ajustar la planificación para atender la diversidad de ritmos y promover aprendizajes significativos para todo el grupo?",
-    options:[
-      "Ajustar la planificación incorporando itinerarios de trabajo con niveles de desafío diferenciados, tiempos flexibles y apoyos graduados, para atender necesidades diversas sin frenar el avance del grupo.",
-      "Ajustar la planificación manteniendo el ritmo de trabajo del grupo que progresa con mayor rapidez y esperando que el resto se adapte gradualmente, sin introducir cambios sustantivos en las actividades.",
-      "Ajustar la planificación condicionando el avance de la unidad a que todo el grupo alcance el mismo nivel de logro, incorporando apoyos diferenciados de manera puntual para quienes presentan mayores dificultades.",
-      "Ajustar la planificación reduciendo el nivel de complejidad de los contenidos para todo el grupo, con el fin de sostener un ritmo común de avance, aun cuando se limite la profundidad de los aprendizajes."
-    ], correct:0,
-    feedback:"Incorporar itinerarios diferenciados con niveles de desafío, tiempos flexibles y apoyos graduados permite atender tanto a quienes avanzan más rápido como a quienes necesitan más tiempo, sin sacrificar el estándar de calidad para ninguno. Las otras opciones sacrifican a un grupo (ya sea los que van rápido o los que van lento) o reducen el nivel de toda la clase, lo cual no constituye una respuesta pedagógica pertinente a la diversidad."
-  },
-
-  // CASO 4 — Ítem 4 (foto: lectura guiada en parejas)
-  {
-    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
-    area:"Área 3: Resultados de aprendizaje de los estudiantes",
-    text:"En una actividad de lectura guiada en parejas, el docente conforma parejas con niveles de desempeño distintos para favorecer el apoyo entre pares. Durante el proceso, observa que el estudiante con mayor dominio de la lectura corrige de forma directa y descalificadora a su compañero, realiza las correcciones por él y avanza sin explicitar estrategias ni modelar el proceso. Esto ha generado desmotivación en el estudiante con mayores dificultades y una relación asimétrica que limita su participación y su autonomía. ¿Cuál debería ser el rol del docente y qué tipo de intervención favorecería un apoyo entre pares respetuoso, formativo y orientado al desarrollo de la autonomía lectora?",
-    options:[
-      "Modelar la lectura guiada entre pares, ejemplificando preguntas de profundización, tipos de comentarios constructivos y conductas a evitar, además de establecer roles rotativos que promuevan la equidad en la participación y el desarrollo progresivo de habilidades colaborativas.",
-      "Observar sistemáticamente los comportamientos, registrando incidencias relevantes para posteriormente realizar orientaciones generales al grupo, enfatizando expectativas conductuales compartidas y criterios comunes sobre el comportamiento adecuado en situaciones académicas.",
-      "Reorganizar temporalmente la actividad en parejas, asumiendo el docente un rol más directivo en la mediación del proceso de lectura, ofreciendo retroalimentación inmediata y modelando estrategias de interacción que favorezcan la concentración y el cumplimiento de la tarea.",
-      "Permitir que entre ellos puedan resolver sus conflictos como compañeros, promoviendo la autorregulación y el desarrollo de habilidades socioemocionales, bajo la premisa de que la experiencia de gestionar dificultades interpersonales es parte del aprendizaje colaborativo."
-    ], correct:0,
-    feedback:"Modelar explícitamente las conductas esperadas en el apoyo entre pares y establecer roles rotativos son las estrategias más formativas y pertinentes. El docente debe intervenir activamente para enseñar cómo apoyar, no solo observar o reorganizar la actividad. Dejar que los estudiantes resuelvan solos una dinámica disfuncional sin intervención pedagógica no garantiza que aprendan las habilidades colaborativas necesarias."
-  },
-
-  // CASO 5 — Ítem 5 (foto: estudiante discalculia)
-  {
-    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
-    area:"Área 3: Resultados de aprendizaje de los estudiantes",
-    text:"En una clase de matemáticas del primer ciclo, la docente observa que un estudiante con discalculia presenta dificultades persistentes para reconocer números, establecer correspondencias uno a uno y comprender el sentido de las operaciones básicas. A pesar de recibir explicaciones repetidas, tiende a memorizar los pasos sin entenderlos y se frustra cuando las actividades avanzan hacia representaciones simbólicas. Además, le cuesta transferir lo aprendido a situaciones cotidianas (contar materiales, repartir objetos, comparar cantidades). ¿Qué tipo de apoyo pedagógico permitiría fortalecer la comprensión numérica y promover avances sostenidos en su aprendizaje matemático?",
-    options:[
-      "Facilitar material fotocopiado o preparado previamente para ayudarle a agilizar las asignaciones en el aula, favoreciendo su participación en el trabajo del grupo.",
-      "Ofrecer materiales concretos para que el estudiante pueda realizar conteo, agrupación de cantidades como apoyo a las actividades matemáticas.",
-      "Mantener su planificación de acuerdo a los lineamientos del diseño curricular para el grado, asegurando así el principio de equidad, permitiendo que el estudiante, igual que los demás, tenga acceso a todos los recursos y materiales disponibles.",
-      "Darle más tiempo para realizar las actividades que involucren el trabajo con números o la resolución de problemas numéricos. Revisar y retroalimentar su trabajo de manera constante para asegurarse de que utilice los números adecuadamente."
-    ], correct:1,
-    feedback:"Los materiales concretos (manipulativos) son la estrategia más adecuada para un estudiante con discalculia, ya que permiten pasar de lo concreto a lo abstracto progresivamente, desarrollando comprensión genuina en lugar de memorización de procedimientos. El material fotocopiado no atiende la dificultad de comprensión. Mantener la misma planificación para todos ignora las necesidades específicas. Más tiempo sin cambio de estrategia no resuelve el problema de comprensión."
-  },
-
-  // CASO 6 — Ítem 6 (foto: recursos digitales con barreras)
-  {
-    dim:"Planificación Pedagógica", dimClass:"dim-planificacion",
-    area:"Área 2: Aplicación del currículo",
-    text:"Con el propósito de ampliar el acceso a la información, un docente incorpora recursos digitales (presentaciones, videos, actividades interactivas) en el aula. Sin embargo, observa que algunos estudiantes presentan barreras para acceder a los contenidos debido a diferencias en habilidades digitales, necesidades educativas específicas o limitaciones en los formatos de los materiales (letra pequeña, exceso de texto, ausencia de apoyos visuales o auditivos). El docente desea asegurarse de que la tecnología no genere nuevas exclusiones. ¿Cuál de las siguientes estrategias permitiría garantizar una accesibilidad plena y equitativa al contenido para todo el estudiantado?",
-    options:[
-      "Priorizar libros impresos y explicaciones orales como estrategia principal, incorporando tecnología solo cuando esté disponible para no generar desigualdades de acceso.",
-      "Utilizar plataformas digitales interactivas, audiolibros y materiales adaptados a diferentes estilos de aprendizaje, combinándolos con alternativas no digitales para garantizar el acceso equitativo a la información.",
-      "Integrar plataformas digitales interactivas y algunos materiales adaptados, manteniendo como base la misma planificación digital para todo el grupo, previendo alternativas análogas equivalentes cuando no haya acceso.",
-      "Utilizar dispositivos electrónicos personales de quienes los tienen para acceder a recursos digitales y organizar pares académicos con quienes no los poseen, de modo que compartan los materiales."
-    ], correct:1,
-    feedback:"Utilizar materiales multimodales adaptados a distintos estilos de aprendizaje, combinando lo digital con alternativas no digitales, es la estrategia más inclusiva. Priorizar solo libros impresos renuncia a las ventajas de la tecnología. Mantener la misma planificación digital para todos asume que todos pueden acceder de igual manera. Depender de que unos estudiantes compartan sus dispositivos personales genera inequidad y dependencia."
-  },
-
-  // CASO 7 — Ítem 7 (foto: segundo grado, lenguaje académico)
-  {
-    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
-    area:"Área 3: Resultados de aprendizaje de los estudiantes",
-    text:"En segundo grado, el docente tiene estudiantes que hablan distintas variedades del idioma y otros que tienen dificultades para comprender términos académicos. Observa que el lenguaje de los textos y consignas resulta poco accesible para algunos, lo que dificulta su comprensión de las tareas. ¿Qué estrategia didáctica permitiría hacer el lenguaje académico más comprensible y accesible sin desvalorizar las variedades lingüísticas del estudiantado?",
-    options:[
-      "Sostener el uso del lenguaje disciplinar propio del área, limitando simplificaciones excesivas, con la intención de favorecer la familiarización gradual con los términos técnicos requeridos en el nivel.",
-      "Priorizar un registro cercano y cotidiano en las interacciones de aula, reduciendo la densidad conceptual del discurso para asegurar que todos los estudiantes participen con mayor comodidad.",
-      "Alternar el uso del lenguaje académico con reformulaciones estratégicas, ejemplos contextualizados y apoyos semánticos que permitan construir significado sin sustituir el vocabulario propio de la disciplina.",
-      "Intervenir de forma frecuente en las participaciones orales para ajustar expresiones al registro académico esperado, procurando que los estudiantes incorporen progresivamente formas lingüísticas consideradas más formales y precisas."
-    ], correct:2,
-    feedback:"Alternar el lenguaje académico con reformulaciones, ejemplos contextualizados y apoyos semánticos es la estrategia que equilibra el respeto a las variedades lingüísticas del estudiantado con el desarrollo del lenguaje académico necesario. Usar solo lenguaje disciplinar puede excluir. Reducir la densidad conceptual empobrece el aprendizaje. Corregir las expresiones orales de los estudiantes puede desvalorizar sus variedades lingüísticas."
-  },
-
-  // CASO 8 — Ítem 8 (foto: actividad parejas, estudiante pasivo)
-  {
-    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
-    area:"Área 3: Resultados de aprendizaje de los estudiantes",
-    text:"Durante una actividad en parejas para resolver una tarea, el docente observa que uno de los estudiantes se desentiende del proceso, permanece pasivo y deja que su compañero asuma la mayor parte del trabajo. Aunque el producto final se completa, no se evidencian aprendizajes compartidos ni corresponsabilidad en el proceso. El docente busca una intervención que promueva la implicación activa de ambos estudiantes y el aprendizaje colaborativo genuino. ¿Qué acción pedagógica permitiría fortalecer el compromiso, la responsabilidad compartida y la participación equitativa de ambos integrantes de la pareja?",
-    options:[
-      "Solicitar que el estudiante más activo modele el procedimiento para su compañero y complete las partes más complejas de la tarea, mientras el otro observa con apoyo y, al final, replica para asegurar que el producto quede terminado.",
-      "Mantener la dinámica de trabajo en parejas y recordar las normas de participación en el grupo, reforzando la importancia del respeto mutuo y del cumplimiento de la tarea, introducir cambios en la estructura del trabajo colaborativo.",
-      "Establecer roles con responsabilidades claras, monitorear el proceso y promover breves instancias de metacognición y coevaluación para equilibrar la participación durante la tarea.",
-      "Reasignar la pareja para evitar el desbalance observado y pedir que cada estudiante entregue una parte individual del producto final, priorizando el resultado del trabajo sobre el proceso de colaboración."
-    ], correct:2,
-    feedback:"Establecer roles claros con responsabilidades diferenciadas, monitorear el proceso e introducir momentos de metacognición y coevaluación son las estrategias más efectivas para garantizar la corresponsabilidad y el aprendizaje genuino de ambos estudiantes. Que el estudiante activo haga la mayor parte del trabajo no resuelve el problema. Recordar normas sin cambiar la estructura tampoco es suficiente. Reasignar la pareja evita el conflicto pero no desarrolla habilidades colaborativas."
-  },
-
-  // CASO 9 — Ítem 9 (foto: retroalimentación vaga)
-  {
-    dim:"Planificación Pedagógica", dimClass:"dim-planificacion",
-    area:"Área 2: Aplicación del currículo",
-    text:"En distintas asignaturas, el docente ofrece comentarios generales como 'bien' o 'debes esforzarte más', pero nota que los estudiantes no saben exactamente qué cambiar ni cómo mejorar su desempeño en tareas futuras. Además, algunos repiten los mismos errores a pesar de haber recibido observaciones previas. El docente desea aplicar una estrategia de retroalimentación que se traduzca en acciones concretas para mejorar el desempeño de los estudiantes. ¿Qué enfoque de retroalimentación permitiría orientar con claridad los próximos pasos de aprendizaje?",
-    options:[
-      "Corregir los errores, explicar las razones y ofrecer orientación sobre cómo mejorar, así podrá adquirir las competencias necesarias.",
-      "Esperar hasta la evaluación final para dar retroalimentación, y así tendrá las oportunidades de mejora durante el proceso de aprendizaje.",
-      "Dar principalmente calificaciones numéricas y comentarios adicionales sobre el desempeño de los estudiantes, solo a los que tuvieron dificultades, para que puedan mejorar su aprendizaje.",
-      "Brindar retroalimentación en sesiones individuales o grupales, resaltando aspectos positivos y proporcionando sugerencias claras para mejorar."
+      "Mantener las actividades que dependen de internet y de dispositivos, dando por hecho que cada familia conseguirá la forma de que el niño se conecte en casa.",
+      "Recortar los contenidos y las metas del grado para exigir menos, conformándose con un nivel más bajo del que indica el currículo con tal de que todos cumplan.",
+      "Aplazar cualquier cambio en la planificación hasta que mejoren la electricidad y la conexión de la escuela y la comunidad.",
+      "Planificar con lo que sí está disponible: exploración del entorno, juegos, materiales concretos, láminas, cuentos y trabajo en equipo, ofreciendo siempre una opción sin conexión para que ningún niño quede fuera."
     ], correct:3,
-    feedback:"La retroalimentación efectiva debe resaltar fortalezas y proporcionar sugerencias claras y específicas para mejorar, dada de manera oportuna durante el proceso. Corregir errores y explicar razones es útil pero incompleto si no incluye orientación sobre los próximos pasos. Esperar hasta la evaluación final elimina la oportunidad de mejora durante el proceso. Solo dar calificaciones numéricas no orienta el aprendizaje."
+    feedback:"Aprovechar los recursos del entorno y materiales concretos, con alternativas sin conexión, garantiza el aprendizaje sin depender de la tecnología y atiende la equidad. Depender de internet amplía la brecha; recortar las metas empobrece la formación; esperar a que mejore el contexto posterga el derecho de los niños a aprender."
   },
 
-  // CASO 10 — Ítem 10 (foto: plataforma en línea, equidad acceso)
+  // CASO 2
   {
     dim:"Planificación Pedagógica", dimClass:"dim-planificacion",
     area:"Área 2: Aplicación del currículo",
-    text:"Un docente implementa una plataforma de aprendizaje en línea para reforzar los contenidos fuera del aula. Tras algunas semanas de uso, percibe que ciertos estudiantes acceden con frecuencia y completan las actividades, mientras que otros presentan baja participación o dificultades para interactuar con los recursos digitales. El docente desea evaluar si la plataforma realmente cumple con el objetivo de garantizar el acceso equitativo y la accesibilidad a la información curricular para todo el grupo. ¿Qué enfoque de evaluación permitiría al docente valorar de manera más pertinente la equidad en el acceso, la usabilidad de la plataforma y su impacto en los aprendizajes?",
+    text:"<span class='ak-m'>Al terminar la unidad de fracciones</span> en quinto grado, una maestra de Matemática aplica una prueba que reúne todo lo trabajado durante varias semanas. Quiere comprobar el nivel de logro que alcanzó cada niño al final del proceso y registrar una calificación que dé cuenta de lo aprendido. La prueba se aplica una vez concluida la enseñanza del tema, por lo que sus resultados servirán para valorar lo aprendido más que para ajustar la clase sobre la marcha. La maestra quiere clasificar correctamente este tipo de evaluación según la función que cumple. Antes había usado pequeñas actividades durante las clases para ir ajustando su enseñanza, pero esta prueba cumple un propósito distinto, ligado al cierre del proceso. La maestra sabe que clasificar bien cada evaluación según su función la ayuda a tomar mejores decisiones y a explicar a las familias para qué sirve cada una. <span class='ak-q'>¿Qué tipo de evaluación está aplicando la maestra en este momento del proceso?</span>",
     options:[
-      "Usando la plataforma principalmente como una alternativa para quienes desean utilizarla, sin integrarla en la planificación ni evaluar su impacto en el aprendizaje, pues podría bajar la calificación de aquellos que no pueden acceder.",
-      "Promoviendo actividades lúdicas dentro de la plataforma para mantener el interés de los estudiantes, sin aplicar evaluaciones, pero sí instrumentos de retroalimentación.",
-      "Realizando un seguimiento del uso de la plataforma, observando la participación de los estudiantes y aplicando encuestas para conocer sus experiencias y dificultades.",
-      "Registrando la cantidad de veces que los estudiantes ingresan a la plataforma, analizar su participación y en ocasiones recogiendo información sobre sus experiencias, así se puede contabilizar la utilización de la plataforma."
-    ], correct:2,
-    feedback:"El seguimiento activo del uso, combinado con la observación de la participación y el recojo de las experiencias y dificultades de los estudiantes mediante encuestas, es el enfoque más completo para evaluar la equidad en el acceso y el impacto real de la plataforma. Las otras opciones son parciales: usar la plataforma como opcional la excluye de la planificación; las actividades lúdicas sin evaluación no miden el impacto; solo registrar accesos no captura la calidad de la experiencia."
-  },
-
-  // CASO 11 — Ítem 11 (foto: competencia escritora, cuentos)
-  {
-    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
-    area:"Área 3: Resultados de aprendizaje de los estudiantes",
-    text:"En el marco del desarrollo de la competencia escritora, el docente observa que el grupo es capaz de construir oraciones y párrafos cortos, pero presenta dificultades para organizar ideas en una secuencia narrativa coherente. Algunos estudiantes escriben de forma impulsiva sin planificar, mientras que otros se bloquean al iniciar el texto o no revisan lo escrito. El docente desea acompañar el proceso de producción de cuentos breves respetando los distintos ritmos de aprendizaje y promoviendo la mejora progresiva de los textos. ¿Qué pasos didácticos debería implementar el docente para guiar la planificación, la escritura y la revisión del cuento, asegurando apoyos diferenciados según las necesidades de cada estudiante?",
-    options:[
-      "Presentar ejemplos de cuentos ya terminados y pedir que los estudiantes identifiquen sus partes; luego, asignar la escritura del cuento de forma individual siguiendo el modelo, con una corrección final del docente.",
-      "Explicar la estructura del cuento con una lámina resumen y proporcionar una plantilla fija para que todos completen el mismo esquema narrativo, revisando al final si cumplieron los pasos establecidos.",
-      "Modelar la estructura con un minicuento, usar un organizador gráfico y dar tiempo de escritura independiente con apoyos puntuales; finalizar con una revisión sencilla.",
-      "Pedirles que libremente escriban un cuento como les parezca y luego lo lean para que los demás den sus impresiones. Corregir ortografía."
-    ], correct:2,
-    feedback:"Modelar con un minicuento, usar organizadores gráficos para planificar y proveer apoyos diferenciados durante la escritura independiente es la secuencia didáctica más completa. Aborda la planificación, la escritura y la revisión, respetando los distintos ritmos. Mostrar modelos sin guiar el proceso no atiende las dificultades. Usar una plantilla fija uniformiza cuando el grupo necesita apoyo diferenciado. Escribir libremente sin estructura no ayuda a quienes se bloquean."
-  },
-
-  // CASO 12 — Ítem 12 (foto: discapacidad auditiva primer ciclo)
-  {
-    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
-    area:"Área 3: Resultados de aprendizaje de los estudiantes",
-    text:"En un aula de primer ciclo, la docente cuenta con un estudiante con discapacidad auditiva que se esfuerza por seguir las explicaciones orales, pero con frecuencia pierde información clave durante las consignas, las discusiones grupales y los momentos de retroalimentación. Esto ha comenzado a afectar su participación en actividades colaborativas y su autonomía para resolver tareas, ya que depende constantemente de la ayuda de sus compañeros. ¿Cuál sería la adaptación pedagógica más pertinente para garantizar el acceso al contenido, la participación activa y la equidad en el aprendizaje de este estudiante?",
-    options:[
-      "Ubicar al estudiante cerca del docente y reforzar la proyección de la voz, incorporando apoyos visuales puntuales en la pizarra para aclarar consignas específicas durante la clase, y promoviendo instancias breves de verificación de comprensión.",
-      "Incorporar apoyos multimodales de forma sistemática (consignas visuales, resúmenes escritos y videos con subtítulos o apoyo en lengua de señas) y ajustar las interacciones para favorecer su participación activa.",
-      "Regular temporalmente su participación en actividades grupales para no afectar el ritmo del curso, compensando con ejercicios de refuerzo adaptados fuera del trabajo colaborativo.",
-      "Incorporar apoyos multimodales de forma ocasional (consignas visuales y resúmenes escritos), manteniendo la dinámica habitual de la clase sin ajustar las interacciones colaborativas, para dar autonomía al grupo."
-    ], correct:1,
-    feedback:"La incorporación sistemática de apoyos multimodales (consignas visuales, resúmenes escritos, subtítulos, lengua de señas) garantiza el acceso continuo al contenido y promueve la participación plena. Los apoyos ocasionales son insuficientes. Ubicar al estudiante cerca del docente ayuda pero no resuelve el problema de acceso a toda la información. Limitar su participación en actividades grupales excluye en lugar de incluir."
-  },
-
-  // CASO 13 — Ítem 13 (foto: discapacidad visual)
-  {
-    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
-    area:"Área 3: Resultados de aprendizaje de los estudiantes",
-    text:"En el aula, un estudiante con discapacidad visual presenta dificultades para acceder a textos impresos, consignas escritas en la pizarra y fichas de trabajo. Aunque el docente repite las instrucciones de forma oral, el estudiante depende constantemente de sus compañeros para completar las actividades, lo que limita su autonomía y participación. El docente busca una respuesta pedagógica que promueva el acceso directo a la información curricular en condiciones de equidad. ¿Qué estrategia de adaptación sería más adecuada para garantizar su inclusión, su autonomía y su acceso efectivo a los contenidos curriculares?",
-    options:[
-      "Asignar un compañero tutor que apoye la lectura de textos durante la clase, complementando ocasionalmente con recursos tecnológicos adaptativos, a fin de facilitar la comprensión del contenido dentro de la dinámica regular del aula.",
-      "Incorporar algunos apoyos y formatos alternativos de acceso al contenido, como recursos auditivos o herramientas tecnológicas de lectura, facilitando que el estudiante pueda seguir el desarrollo de las actividades junto al resto del grupo.",
-      "Eximir al estudiante de actividades centradas en la lectura escrita, priorizando su participación en tareas orales y evaluaciones alternativas, de manera que pueda demostrar la apropiación de los contenidos conforme a sus posibilidades y estilo de aprendizaje predominante.",
-      "Utilizar los mismos materiales con ajustes puntuales de acceso, esperando que el estudiante desarrolle progresivamente estrategias compensatorias propias para interactuar con el contenido, brindando apoyos específicos cuando sea necesario, sin modificar los indicadores de logro establecidos para el nivel."
-    ], correct:1,
-    feedback:"Incorporar formatos alternativos de acceso (recursos auditivos, herramientas tecnológicas de lectura) de forma sistemática es la estrategia más apropiada para garantizar la autonomía e inclusión real. El compañero tutor crea dependencia interpersonal. Eximirlo de actividades escritas limita su aprendizaje y puede afectar el logro de los indicadores. Esperar que desarrolle estrategias compensatorias propias transfiere al estudiante una responsabilidad que corresponde al docente."
-  },
-
-  // CASO 14 — Ítem 14 (foto: brecha TIC sexto grado)
-  {
-    dim:"Planificación Pedagógica", dimClass:"dim-planificacion",
-    area:"Área 2: Aplicación del currículo",
-    text:"En sexto grado, algunos estudiantes tienen acceso a dispositivos en casa y otros no. El docente quiere evitar que las tareas tecnológicas amplíen las brechas de aprendizaje y asegurar que todos se beneficien del uso de las TIC en el aula. ¿Cómo puede el docente organizar el uso de la tecnología para garantizar condiciones de equidad en el aprendizaje de todo el grupo?",
-    options:[
-      "Diseñar actividades que combinen recursos digitales y analógicos, permitiendo que todos los estudiantes participen sin importar sus recursos personales.",
-      "Utilizar principalmente plataformas en línea para todas las actividades, sin ofrecer alternativas para quienes no tienen acceso a tecnología en casa.",
-      "Excluir la tecnología del aula para evitar desigualdades, enfocándose solo en métodos tradicionales de enseñanza.",
-      "Depender completamente de los dispositivos personales de los estudiantes, sin considerar la brecha digital existente en el grupo."
+      "Una evaluación sumativa, porque se aplica al final de la unidad para comprobar el nivel de logro alcanzado y traducirlo en una calificación que da cuenta de lo aprendido.",
+      "Una evaluación diagnóstica, porque sirve para conocer qué saben los niños antes de empezar un tema nuevo.",
+      "No hace falta evaluar al cerrar una unidad; bastaría con esperar a la prueba de fin de período para recogerlo todo de una vez.",
+      "Una evaluación formativa, porque acompaña el aprendizaje de manera continua mientras la unidad todavía se desarrolla."
     ], correct:0,
-    feedback:"Diseñar actividades que combinen recursos digitales y analógicos garantiza que todos los estudiantes puedan participar independientemente de sus recursos personales, promoviendo la equidad. Usar solo plataformas en línea excluye a quienes no tienen acceso en casa. Excluir la tecnología priva a todos de recursos valiosos. Depender de dispositivos personales amplía la brecha digital."
+    feedback:"La evaluación sumativa se aplica al cierre para medir el nivel alcanzado y emitir una calificación. La diagnóstica explora lo que el niño sabe antes de iniciar; la formativa acompaña el proceso durante la unidad; esperar al fin de período priva a la maestra de información oportuna."
   },
 
-  // CASO 15 — Ítem 15 (foto: lenguaje académico accesible)
-  {
-    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
-    area:"Área 3: Resultados de aprendizaje de los estudiantes",
-    text:"La profesora observa que, durante los proyectos grupales, su grupo muestra un bajo nivel de compromiso: algunos estudiantes cumplen de manera mínima, otros delegan en sus compañeros y la mayoría percibe las tareas como poco relevantes para su vida cotidiana. Aunque se cumplen los pasos del proyecto, no se evidencia apropiación de los aprendizajes ni entusiasmo por el trabajo colaborativo. Lucía desea rediseñar su enfoque para aumentar la motivación y fortalecer la colaboración. ¿Qué acción pedagógica permitiría incrementar el sentido de propósito del proyecto y favorecer una colaboración más auténtica entre los estudiantes?",
-    options:[
-      "Seleccionar objetivos enfocados en la adquisición de información, asegurando que los estudiantes adquieran datos relevantes que se relacionen con su vida cotidiana, lo que permitirá que estos contextualicen a su entorno el contenido.",
-      "Seleccionar objetivos uniformes para todo el grupo, adaptados a los intereses, ritmos y contextos de los estudiantes y que estén alineados al currículo.",
-      "Seleccionar objetivos que tengan conexión con intereses y situaciones reales de los estudiantes, logrando así que encuentren sentido y valor personal en las actividades realizadas.",
-      "Definir objetivos que se ajusten principalmente a los contenidos del currículo oficial, priorizando la cobertura del programa y la relevancia para el estudiante."
-    ], correct:2,
-    feedback:"Seleccionar objetivos conectados con los intereses y situaciones reales de los estudiantes es la estrategia más efectiva para aumentar la motivación y el sentido de propósito. Cuando los estudiantes ven la relevancia personal de lo que aprenden, se involucran de forma más auténtica. Enfocarse solo en adquisición de información, objetivos uniformes sin conexión real, o priorizar la cobertura curricular sin atender los intereses del grupo no resuelve el problema de motivación y compromiso."
-  },
-
-  // CASO 16 — Ítem 16 (foto: evaluación cierre unidad lengua española)
+  // CASO 3
   {
     dim:"Planificación Pedagógica", dimClass:"dim-planificacion",
     area:"Área 2: Aplicación del currículo",
-    text:"Al finalizar una unidad de Lengua Española, el docente quiere identificar en qué medida los estudiantes han logrado los aprendizajes esperados en comprensión lectora y producción escrita. Le interesa contar con evidencias del nivel alcanzado para retroalimentar al grupo, ajustar la enseñanza posterior y comunicar avances, sin que la evaluación se limite a la memorización de contenidos. ¿Qué tipo de evaluación le brindaría la información más pertinente sobre los conocimientos y habilidades adquiridos por sus estudiantes al cierre del tema?",
+    text:"<span class='ak-m'>Como actividad de cierre del primer período</span>, una maestra de tercer grado quiere que sus estudiantes muestren de manera auténtica lo que aprendieron sobre las plantas, más allá de repetir contenidos de memoria. Busca una propuesta con sentido en la que <span class='ak-p'>los niños tengan un papel activo y tomen decisiones</span> sobre lo que harán y cómo lo presentarán, mientras ella los acompaña y observa su desempeño. Recuerda que, en años anteriores, el cierre se reducía a repetir lo visto y quiere evitar que vuelva a ocurrir. En tercer grado, los niños disfrutan aprender haciendo y se entusiasman cuando pueden mostrar lo que saben a su manera. La maestra quiere que el cierre sea una experiencia con sentido, en la que se vea no solo lo que recuerdan, sino lo que son capaces de hacer con lo aprendido, y que a la vez le sirva a ella para valorar competencias y no solo contenidos memorizados. <span class='ak-q'>¿Cuál de las siguientes opciones representa mejor una actividad de cierre con sentido auténtico?</span>",
     options:[
-      "Evaluación sumativa, ya que busca medir el rendimiento final de los estudiantes y asignar calificaciones.",
-      "Evaluación diagnóstica, le permite ver lo que saben los estudiantes del tema a continuación y de allí puede tener claro lo que aprendieron del anterior.",
-      "Evaluación formativa, ya que se aplica durante todo el proceso de aprendizaje.",
-      "Ninguna evaluación es necesaria al finalizar un tema, el docente debe esperar al momento de realizar la evaluación de fin de período."
+      "Formar grupos por sorteo, dar a cada uno una guía para que prepare por su cuenta una exposición y premiar a la que quede mejor.",
+      "Invitar a los niños a juntarse por afinidad y preparar un cartel vistoso para mostrarlo al resto de la clase.",
+      "Armar grupos para que repasen y expongan los contenidos vistos durante el período.",
+      "Proponer un proyecto, como sembrar y cuidar un pequeño huerto, en el que los niños acuerden tareas, tomen decisiones y muestren lo aprendido resolviendo algo real, mientras la maestra acompaña y observa su desempeño."
+    ], correct:3,
+    feedback:"Un proyecto participativo en el que los niños deciden, asumen tareas y aplican lo aprendido para resolver algo real evidencia aprendizajes auténticos. Las exposiciones competitivas o de repaso tienden a la repetición de contenidos y no muestran la aplicación significativa."
+  },
+
+  // CASO 4
+  {
+    dim:"Planificación Pedagógica", dimClass:"dim-planificacion",
+    area:"Área 2: Aplicación del currículo",
+    text:"Una maestra de segundo grado planifica actividades apoyadas en una aplicación educativa y en videos. Al revisar la situación de su grupo, nota que <span class='ak-p'>hay una clara brecha digital: algunos niños tienen dispositivos y conexión en casa y otros no tienen ningún acceso</span>. La maestra teme que, si las tareas dependen de la tecnología en el hogar, las diferencias de acceso aumenten las desigualdades y dejen atrás justo a quienes ya tienen menos. No quiere renunciar a la tecnología, pero tampoco que se convierta en una barrera. En segundo grado, varios niños apenas comienzan a manejar dispositivos y dependen por completo de lo que se haga en la escuela. La maestra observa que, cuando una tarea queda atada al equipo de casa, los mismos niños quedan siempre fuera y empiezan a sentirse menos capaces que sus compañeros. Quiere que la tecnología sume y no se convierta en un motivo más de desigualdad. <span class='ak-q'>¿Qué decisión de planificación favorecería la participación equitativa de todo el grupo?</span>",
+    options:[
+      "Dejar que todo dependa de los equipos que cada niño tenga en casa, de modo que quienes no cuentan con dispositivos no puedan hacer las actividades.",
+      "Basar casi todas las tareas en la aplicación y los videos, sin prever opciones para quienes no tienen acceso en casa, lo que agranda las diferencias.",
+      "Combinar actividades con y sin tecnología y organizar turnos para usar los pocos equipos de la escuela, de modo que todos participen sin importar lo que tengan en casa.",
+      "Quitar por completo la tecnología para evitar desigualdades, quedándose solo con métodos tradicionales y desaprovechando un recurso útil."
+    ], correct:2,
+    feedback:"Combinar recursos con y sin tecnología y organizar el uso de los equipos de la escuela permite que todos participen sin importar sus recursos personales. Depender de los dispositivos de casa o usar solo la aplicación amplía la brecha; eliminar la tecnología desaprovecha un recurso valioso."
+  },
+
+  // CASO 5
+  {
+    dim:"Planificación Pedagógica", dimClass:"dim-planificacion",
+    area:"Área 2: Aplicación del currículo",
+    text:"<span class='ak-m'>Durante el desarrollo de una unidad de Matemática</span> en sexto grado, un maestro observa que <span class='ak-p'>su grupo avanza a ritmos muy diferentes</span>: unos niños resuelven rápido y piden más retos, mientras otros necesitan más tiempo, más ejemplos y acompañamiento para lograr lo mismo. El maestro nota que, con un único ritmo para todos, unos se aburren y otros se quedan atrás y se desaniman. Quiere ajustar su planificación para atender esa diversidad sin frenar al grupo ni dejar a nadie atrás. El maestro ha notado que, cuando todos hacen exactamente lo mismo al mismo tiempo, los niños que terminan rápido pierden el interés y los que necesitan más apoyo se frustran y dejan de intentarlo. Sabe que en sexto grado las diferencias se acentúan y que su planificación debe prever esa diversidad desde el inicio, no improvisar sobre la marcha. <span class='ak-q'>¿Qué ajuste a la planificación atendería mejor esta diversidad de ritmos?</span>",
+    options:[
+      "Bajar la dificultad de las tareas para todo el grupo y avanzar al mismo paso, aunque eso limite cuánto pueden aprender quienes podrían dar más.",
+      "Detener el avance de la unidad hasta que todos lleguen al mismo nivel, dando apoyos diferenciados solo de vez en cuando a quienes más lo necesitan.",
+      "Ofrecer distintos caminos de trabajo, con tareas de varios niveles, tiempos flexibles y apoyos según la necesidad, para atender a todos sin frenar al grupo ni desmotivar a nadie.",
+      "Llevar el ritmo de los más rápidos y esperar que el resto se vaya acoplando poco a poco, sin cambiar realmente las actividades."
+    ], correct:2,
+    feedback:"Ofrecer itinerarios con distintos niveles de reto, tiempos flexibles y apoyos graduados atiende a quienes avanzan rápido y a quienes necesitan más acompañamiento, sin sacrificar a nadie. Bajar la dificultad, frenar el avance o seguir el ritmo de los más rápidos perjudica a algún grupo."
+  },
+
+  // CASO 6
+  {
+    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
+    area:"Área 3: Resultados de aprendizaje de los estudiantes",
+    text:"Durante un trabajo en grupo en la clase de Ciencias Sociales, <span class='ak-p'>dos niños de un mismo equipo discuten una y otra vez</span> por cómo repartir las tareas. La tensión interrumpe la actividad y empieza a afectar el ambiente del aula y a los demás compañeros. La maestra entiende que no se trata solo de poner orden, sino de ayudarlos a resolver el conflicto y aprovecharlo para que aprendan a comunicarse y a llegar a acuerdos. Por eso decide intervenir. La maestra sabe que en primaria los niños todavía están aprendiendo a convivir, a expresar lo que sienten y a ponerse de acuerdo, y que un conflicto bien acompañado puede convertirse en una oportunidad para desarrollar esas habilidades. Quiere actuar sin tomar partido por ninguno, cuidando que ambos se sientan respetados y que el equipo recupere un buen clima de trabajo. <span class='ak-q'>¿Cuál sería la forma más pertinente de intervenir ante este conflicto?</span>",
+    options:[
+      "Intervenir, pero pidiendo al orientador o psicólogo que indique qué hacer, para zanjar pronto el asunto y volver al trabajo.",
+      "Mediar entre ambos, ayudándolos a expresarse, a escucharse y a acordar juntos una solución en la que los dos se sientan tomados en cuenta y se comprometan con el equipo.",
+      "No intervenir y dejar que lo resuelvan solos para no cortar la dinámica del grupo, aunque la tensión siga afectando a los demás.",
+      "Ponerles una tarea extra a los dos como castigo, para imponer orden y evitar nuevas discusiones."
+    ], correct:1,
+    feedback:"Mediar para que los niños se comuniquen y acuerden una solución en la que ambos se sientan escuchados desarrolla habilidades de convivencia y corresponsabilidad. Derivar de inmediato evita la mediación que corresponde al docente; dejar que lo resuelvan solos cuando escala no garantiza aprendizaje; castigar no enseña a resolver conflictos."
+  },
+
+  // CASO 7
+  {
+    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
+    area:"Área 3: Resultados de aprendizaje de los estudiantes",
+    text:"<span class='ak-m'>Tras concluir la evaluación de una unidad</span>, una maestra de primaria se dispone a <span class='ak-p'>comunicar los resultados de aprendizaje a las familias y a los niños</span>. Sabe que la forma de comunicarlos influye en el aprendizaje: si solo entrega una nota, ni las familias ni los niños saben en qué mejorar; en cambio, una comunicación basada en evidencias puede orientar los siguientes pasos. Quiere que ese momento sirva para reconocer logros, señalar lo que falta y comprometer a todos en la mejora. En el Nivel Primario, el acompañamiento de las familias es decisivo, y la maestra sabe que una comunicación clara y a tiempo puede marcar la diferencia en el aprendizaje de un niño. También quiere que los propios niños comprendan en qué van bien y qué pueden mejorar, para que se sientan parte activa de su proceso y no simples receptores de una calificación. <span class='ak-q'>¿Cuál es la mejor manera de comunicar estos resultados de aprendizaje?</span>",
+    options:[
+      "Entregar solo la nota en un informe y dejar las explicaciones sobre logros y aspectos a mejorar para el final del año, cuando ya casi no hay margen.",
+      "Conversar con las familias y los niños, en encuentros individuales o grupales, mostrando con evidencias los avances, las fortalezas y lo que falta, y dando recomendaciones concretas para seguir mejorando.",
+      "Informar sobre todo a las familias, sin hacer partícipe al niño del proceso, y darle aparte algún comentario sobre cómo le fue.",
+      "Reunirse solo con los niños para comentarles en general cómo van, sin involucrar a las familias, por considerar que cada quien es responsable de su aprendizaje."
+    ], correct:1,
+    feedback:"Conversar con familias y niños mostrando avances, fortalezas, aspectos a mejorar y recomendaciones concretas promueve la comprensión, la mejora y la corresponsabilidad, clave en primaria. La nota aislada no orienta; excluir a los niños o a las familias rompe la corresponsabilidad."
+  },
+
+  // CASO 8
+  {
+    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
+    area:"Área 3: Resultados de aprendizaje de los estudiantes",
+    text:"Una maestra de primaria tiene en su grupo a <span class='ak-c'>un niño con discapacidad visual y a otros con dificultades importantes para leer</span>. Casi todos los materiales son impresos con letra pequeña y muchas consignas se escriben en la pizarra, por lo que <span class='ak-p'>estos niños no pueden acceder por sí mismos a los contenidos</span> y dependen de que un compañero les lea o les explique. La maestra entiende que la dificultad no está en las capacidades de los niños, sino en cómo se presentan los materiales, y quiere ajustarlo para que todos aprendan en igualdad. La maestra entiende que el currículo del Nivel Primario plantea que todos los niños deben tener acceso a los aprendizajes fundamentales, y que las barreras suelen estar en los materiales y no en los niños. Por eso busca una respuesta que beneficie a todo el grupo y no solo a quienes presentan una dificultad concreta, evitando soluciones que los separen de sus compañeros. <span class='ak-q'>¿Qué ajustes en la planificación y en los recursos favorecerían un aprendizaje inclusivo y accesible para todo el grupo?</span>",
+    options:[
+      "Adaptar la planificación con materiales accesibles y apoyos en varios formatos (audio, letra grande, lectura en voz alta, imágenes y descripciones), para que todo el grupo —incluidos quienes tienen baja visión o dificultades de lectura— participe y aprenda en igualdad.",
+      "Darles a estos niños tareas más sencillas por separado, en lugar de integrarlos en las actividades que hace el resto de la clase.",
+      "Seguir usando los mismos textos impresos y las consignas en la pizarra sin cambios, esperando que poco a poco se acostumbren al ritmo del grupo.",
+      "Exigir los mismos materiales para todos y adaptar solo lo imprescindible, con la idea de que así se vuelven más autónomos y no dependen de apoyos."
     ], correct:0,
-    feedback:"La evaluación sumativa es la más pertinente al cierre de una unidad, ya que permite medir el nivel alcanzado por los estudiantes en los aprendizajes esperados y proporcionar información para retroalimentar, ajustar la enseñanza y comunicar avances. La evaluación diagnóstica se usa para identificar conocimientos previos antes de iniciar una unidad nueva. La evaluación formativa acompaña el proceso durante la unidad. Esperar hasta el fin de período priva al docente de información valiosa y oportuna."
+    feedback:"Incorporar materiales accesibles (letra grande, audio, imágenes, lectura en voz alta) y apoyos variados garantiza el acceso y la participación en condiciones de equidad. Las tareas más sencillas por separado bajan las expectativas; mantener los materiales sin cambios o exigir los mismos para todos ignora las barreras y confunde la igualdad con la equidad."
   },
 
-  // ── CASOS ADICIONALES CREADOS (17-40) ────────────────
+  // CASO 9
+  {
+    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
+    area:"Área 3: Resultados de aprendizaje de los estudiantes",
+    text:"Durante una actividad en parejas en la clase de Ciencias de la Naturaleza, una maestra nota que <span class='ak-p'>uno de los niños hace casi todo el trabajo mientras el otro se queda pasivo</span> y espera a que su compañero termine. Aunque el resultado parece bien, la maestra sabe que la pasividad de uno le impide aprender y le quita sentido al trabajo en equipo. Quiere reorganizar la tarea para equilibrar la participación y que se note el aporte de cada uno. La maestra sabe que el trabajo en equipo, en estas edades, no se da solo: hay que enseñarlo y estructurarlo para que cada niño tenga algo claro que aportar. Le preocupa que, si la situación se repite, el niño pasivo se acostumbre a no participar y el otro cargue siempre con todo, perdiéndose el sentido formativo de trabajar juntos. <span class='ak-q'>¿Qué estrategia favorecería una participación más equitativa durante el trabajo en parejas?</span>",
+    options:[
+      "Pedir al niño más activo que haga las partes difíciles y sirva de ejemplo, mientras el otro observa y aprende por imitación.",
+      "Seguir con la misma actividad y recordar las normas de respeto y participación, pero sin cambiar cómo está organizada la tarea.",
+      "Darle a cada niño un rol con responsabilidades claras, acompañar el proceso y abrir momentos breves para que reflexionen sobre su aporte y se evalúen entre sí, de modo que ambos participen.",
+      "Cambiar de pareja para evitar el desbalance y pedir a cada uno una parte individual, fijándose más en el resultado que en el proceso."
+    ], correct:2,
+    feedback:"Asignar roles claros, acompañar el proceso y abrir momentos de reflexión y coevaluación equilibra la participación y desarrolla la corresponsabilidad. Que el niño activo haga lo difícil refuerza la pasividad; recordar normas sin cambiar la estructura no resuelve el desbalance; cambiar la pareja evita el problema pero no enseña a colaborar."
+  },
 
-  // CASO 17 — Evaluación por competencias
+  // CASO 10
+  {
+    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
+    area:"Área 3: Resultados de aprendizaje de los estudiantes",
+    text:"Una escuela primaria empieza a usar una aplicación de lectura como apoyo a las clases. La coordinación pide a los docentes que <span class='ak-p'>den seguimiento al uso de la aplicación y conozcan su efecto real en el aprendizaje</span>, no solo cuántas veces entra cada niño. Una maestra reflexiona sobre cómo recoger información más útil: no únicamente si los niños entran, sino cómo participan, qué dificultades tienen y si la herramienta de verdad ayuda a que lean mejor. La maestra recuerda que una herramienta digital solo aporta si de verdad mejora los aprendizajes, y que para saberlo no basta con un dato de uso. En primaria, además, conviene atender cómo se sienten los niños al usarla y qué obstáculos encuentran, para decidir si conviene mantenerla, ajustarla o combinarla con otras estrategias de lectura. <span class='ak-q'>¿Cómo podría la maestra dar ese seguimiento de manera más completa?</span>",
+    options:[
+      "Anotar solo cuántas veces entra cada niño a la aplicación y, de vez en cuando, preguntar por sus experiencias.",
+      "Llenar la aplicación de juegos para mantener el interés, sin evaluar el aprendizaje, aunque con algún instrumento de retroalimentación.",
+      "Dejar la aplicación como algo opcional para quien quiera usarla, sin incluirla en la planificación ni medir si ayuda a aprender.",
+      "Observar cómo participan los niños, revisar el uso que hacen de la aplicación y aplicar preguntas sencillas sobre sus experiencias y dificultades, para entender las barreras de acceso y su efecto real en la lectura."
+    ], correct:3,
+    feedback:"Observar la participación, revisar el uso y consultar a los niños sobre sus experiencias y dificultades es el enfoque más completo para valorar el acceso, la usabilidad y el efecto real en el aprendizaje. Contar solo los ingresos no capta la calidad; los juegos sin evaluación no miden impacto; usarla como opcional la deja fuera de la planificación."
+  },
+
+  // CASO 11
+  {
+    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
+    area:"Área 3: Resultados de aprendizaje de los estudiantes",
+    text:"En la clase de Lengua Española, una maestra de cuarto grado pide a sus estudiantes que escriban un cuento. Al revisar los borradores, observa que <span class='ak-p'>a la mayoría le cuesta organizar el texto de forma ordenada</span>: mezclan las ideas y no distinguen con claridad un inicio, un desarrollo y un final. La maestra quiere enseñarles a estructurar su escrito de manera que comprendan para qué sirve cada parte, sin limitarse a llenar un molde rígido ni a corregir solo la forma al final. La maestra sabe que aprender a escribir es uno de los aprendizajes centrales del Nivel Primario y que organizar las ideas no se logra con una sola indicación. Quiere que los niños comprendan que un texto tiene partes con una función y que esa estructura los ayuda a expresarse mejor, atendiendo además a quienes todavía se bloquean al momento de empezar a escribir. <span class='ak-q'>¿Qué estrategia didáctica favorecería que aprendan a estructurar su texto?</span>",
+    options:[
+      "Dejar que escriban el cuento libremente, leerlo ante el grupo para recibir comentarios y limitarse a corregir la ortografía.",
+      "Explicar la estructura con un esquema y dar una plantilla fija para que todos rellenen el mismo molde, revisando al final solo si siguieron los pasos.",
+      "Mostrar cuentos ya hechos para que identifiquen sus partes y, luego, pedir que cada quien escriba el suyo imitando el modelo, con una corrección final de la maestra.",
+      "Leer juntos un cuento modelo y analizar sus partes, ofrecer un organizador para planificar inicio, desarrollo y final, dejar que escriban con apoyos según lo que cada niño necesite y cerrar con una revisión guiada sencilla."
+    ], correct:3,
+    feedback:"Analizar un texto modelo, planificar con un organizador y escribir con apoyos diferenciados, cerrando con una revisión guiada, atiende planificación, escritura y revisión respetando los distintos ritmos. Escribir sin guía no ayuda a quienes se bloquean; la plantilla fija uniformiza; mostrar modelos sin guiar el proceso no atiende las dificultades."
+  },
+
+  // CASO 12
+  {
+    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
+    area:"Área 3: Resultados de aprendizaje de los estudiantes",
+    text:"Una maestra de quinto grado revisa el cuento de un niño. El texto ordena bien las ideas principales y se nota el esfuerzo, pero presenta <span class='ak-p'>errores frecuentes en el uso de los signos de puntuación y en la conexión entre las ideas</span>. La maestra quiere escribirle una retroalimentación que reconozca lo logrado, le diga con precisión qué mejorar y le indique acciones concretas para hacerlo, en lugar de un elogio vago o una crítica general. La maestra sabe que en estas edades la forma en que se devuelve un trabajo influye mucho en la confianza del niño y en sus ganas de seguir escribiendo. Quiere que su comentario lo anime a mejorar, le muestre con claridad en qué fijarse y le dé pistas concretas para corregir, en lugar de dejarlo con una idea vaga de que 'algo está mal'. <span class='ak-q'>¿Cuál de las siguientes retroalimentaciones es más formativa y útil para el niño?</span>",
+    options:[
+      "«Lograste ordenar muy bien las ideas de tu cuento; ahora fíjate en los puntos y las comas y en cómo unes una idea con otra, y corrige estos dos pasajes para que se entienda mejor.»",
+      "«¡Muy buen trabajo, sigue así! Se nota tu esfuerzo por organizar el cuento y por mantener la idea principal.»",
+      "«La próxima vez te saldrá mejor; con más práctica irás superando estas dificultades. Cuenta conmigo para seguir avanzando.»",
+      "«Tu cuento tiene varios errores y le falta conexión entre las ideas; debes esforzarte más para mejorar tu resultado.»"
+    ], correct:0,
+    feedback:"La retroalimentación que reconoce el logro y, a la vez, señala con precisión qué revisar y cómo hacerlo (ejemplos concretos y pasajes específicos) favorece la autorregulación y el aprendizaje. El elogio vago, las frases motivadoras sin orientación o los comentarios negativos generales no le dicen al niño qué cambiar."
+  },
+
+  // CASO 13
+  {
+    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
+    area:"Área 3: Resultados de aprendizaje de los estudiantes",
+    text:"En un grupo de primer ciclo conviven <span class='ak-c'>niños con distintas formas de hablar y trayectorias muy diferentes</span>. La maestra nota que a muchos <span class='ak-p'>les cuesta comprender algunas palabras propias de la asignatura</span>, lo que les impide seguir las explicaciones y participar con confianza. Quiere que poco a poco se apropien de esas palabras, sin que el lenguaje se convierta en una barrera y sin empobrecer lo que aprenden. La maestra sabe que en el primer ciclo los niños están construyendo su lenguaje y que las palabras nuevas se aprenden mejor cuando se conectan con lo que ya conocen. Le preocupa que, si las palabras de la asignatura se vuelven una barrera, algunos niños dejen de participar y se convenzan de que 'eso no es para ellos', por lo que busca una estrategia que abra puertas y no que las cierre. <span class='ak-q'>¿Qué estrategia favorecería la comprensión sin renunciar al vocabulario de la asignatura?</span>",
+    options:[
+      "Mantener las palabras difíciles tal cual, sin explicarlas mucho, esperando que con el tiempo los niños se acostumbren a ellas.",
+      "Hablar casi siempre con palabras muy sencillas y bajar el nivel de los temas para que todos estén cómodos, aunque se dejen de lado las palabras propias de la asignatura.",
+      "Usar las palabras de la asignatura junto con explicaciones sencillas, ejemplos cercanos, imágenes y gestos que ayuden a captar su significado, sin renunciar a ese vocabulario.",
+      "Corregir seguido la manera de hablar de los niños para llevarla al lenguaje esperado, buscando que adopten formas más formales."
+    ], correct:2,
+    feedback:"Combinar las palabras propias de la asignatura con explicaciones sencillas, ejemplos e imágenes tiende puentes entre el lenguaje cotidiano del niño y el vocabulario nuevo, sin empobrecer el aprendizaje. Mantener solo las palabras difíciles puede excluir; bajar el nivel empobrece; corregir el habla puede desvalorizar las formas del niño."
+  },
+
+  // CASO 14
+  {
+    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
+    area:"Área 3: Resultados de aprendizaje de los estudiantes",
+    text:"En la clase de Ciencias de la Naturaleza, un maestro entrega una actividad a partir de un texto con instrucciones. Al observar al grupo, nota que <span class='ak-p'>muchos niños no distinguen los datos importantes de los detalles secundarios</span>: leen todo, pero no saben qué hacer con lo que leen. El maestro quiere enseñarles a comprender e interpretar este tipo de texto, reconociendo la información clave y el orden de los pasos. El maestro sabe que comprender lo que se lee es la base de casi todos los aprendizajes del Nivel Primario y que muchos niños no fallan por no saber leer, sino por no saber qué hacer con la información. Quiere mostrarles, paso a paso, cómo se piensa frente a un texto con instrucciones, para que luego puedan hacerlo cada vez con más autonomía. <span class='ak-q'>¿Qué estrategia ayudaría mejor a que aprendan a interpretarlo?</span>",
+    options:[
+      "Pedirles que busquen en el material casos parecidos y los copien por su cuenta, dejando que se organicen solos sin una guía previa.",
+      "Leer juntos las instrucciones, resolver dudas generales y luego pedir que cada quien haga la actividad solo, siguiendo el texto.",
+      "Pedir a un niño que pase a explicar los pasos en la pizarra mientras los demás observan y toman nota, para después intentarlo cada uno.",
+      "Trabajar un texto a la vista de todos: leerlo y analizarlo juntos, mostrar cómo reconocer la información importante y el orden de los pasos, permitir errores y comentarlos, y solo después pedir el trabajo individual y compartir."
+    ], correct:3,
+    feedback:"Modelar la lectura con un texto compartido (analizarlo juntos, señalar la información clave y el orden de los pasos, permitir el error y retroalimentar) antes del trabajo individual hace visible cómo interpretar. Copiar sin guía o leer las instrucciones no atiende la dificultad; que un niño modele ayuda, pero el docente debe hacer explícito el proceso."
+  },
+
+  // CASO 15
+  {
+    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
+    area:"Área 3: Resultados de aprendizaje de los estudiantes",
+    text:"Un maestro de quinto grado plantea a sus estudiantes problemas con situaciones cotidianas, les pide que los resuelvan y que cuenten cómo pensaron. Al revisar, ve que algunos llegan al resultado correcto pero <span class='ak-p'>no saben explicar cómo lo hicieron</span>, y otros solo repiten pasos memorizados de forma mecánica. El maestro entiende que no basta con dar con la respuesta y busca una estrategia que haga visible el razonamiento de los niños mientras resuelven. El maestro sabe que, en Matemática, llegar al resultado correcto no garantiza que el niño haya comprendido, y que poner en palabras cómo se piensa ayuda a aprender de verdad. Quiere crear un ambiente en el que equivocarse y explicar el propio razonamiento sea parte natural de la clase, para que todos se animen a mostrar cómo llegaron a sus respuestas. <span class='ak-q'>¿Qué estrategia permitiría promover la reflexión y hacer visible el proceso de pensamiento?</span>",
+    options:[
+      "Plantear un problema, acordar entre todos una única forma de resolverlo y luego aplicarla en otro ejercicio para comprobar que siguieron los mismos pasos.",
+      "Plantear un problema y pedir que propongan varias maneras de resolverlo, dibujando o anotando los pasos y el porqué de cada decisión; al final comparan los caminos y explican cuál les resultó más claro.",
+      "Mostrar un ejemplo paso a paso, dejar los pasos a la vista en un cartel y pedir que resuelvan ejercicios parecidos comprobando si llegan al mismo resultado.",
+      "Formar grupos para que resuelvan juntos, apoyándose entre sí, y que al terminar cada grupo diga su respuesta explicando brevemente cómo la obtuvo."
+    ], correct:1,
+    feedback:"Pedir varias maneras de resolver, registrar pasos y razones con apoyos y luego comparar enfoques explicando cuál fue más claro promueve la reflexión y hace visible el pensamiento. Acordar una única forma o modelar para repetir prioriza el resultado; el trabajo en grupo ayuda, pero por sí solo no garantiza la reflexión."
+  },
+
+  // CASO 16
   {
     dim:"Planificación Pedagógica", dimClass:"dim-planificacion",
     area:"Área 2: Aplicación del currículo",
-    text:"Una docente de tercer ciclo observa que sus evaluaciones consisten principalmente en pruebas escritas de selección múltiple que miden la memorización de contenidos. Al reflexionar sobre su práctica, desea diseñar evaluaciones que realmente evidencien el desarrollo de competencias en sus estudiantes. ¿Cuál de las siguientes estrategias evaluativas le permitiría obtener evidencias más completas sobre el desarrollo de las competencias de sus estudiantes?",
+    text:"<span class='ak-m'>Al inicio del año escolar</span>, una maestra de primaria quiere <span class='ak-p'>conocer las fortalezas y los vacíos de su grupo antes de empezar a enseñar los nuevos contenidos</span>. Sabe que conocer el punto de partida de cada niño le permitirá planificar mejor los apoyos, los agrupamientos y la secuencia, en lugar de avanzar sin saber con qué cuentan. Por eso quiere aplicar una evaluación al comienzo, con una función específica. La maestra sabe que empezar el año sin conocer a su grupo es como planificar a ciegas, y que cada niño llega con una historia y un punto de partida distinto. Quiere que su primera evaluación cumpla precisamente esa función de punto de partida, para organizar desde el inicio los apoyos y agrupamientos que su grupo necesita. <span class='ak-q'>¿Qué tipo de evaluación debe aplicar la maestra en este momento?</span>",
     options:[
-      "Aumentar la frecuencia de las pruebas escritas y diversificar los tipos de preguntas, incluyendo preguntas abiertas junto a las de selección múltiple.",
-      "Diseñar tareas auténticas que requieran que los estudiantes apliquen sus conocimientos para resolver situaciones reales o simuladas, evaluando el proceso y el producto con rúbricas.",
-      "Asignar trabajos de investigación individuales sobre los temas trabajados en clase, calificándolos con una escala numérica basada en la calidad de la información presentada.",
-      "Implementar la coevaluación entre estudiantes al final de cada unidad, pidiendo que se califiquen mutuamente según criterios definidos por el propio docente."
+      "Una evaluación formativa, ya que acompaña los avances durante el proceso y no se usa antes de comenzar un tema.",
+      "Una evaluación diagnóstica, ya que al inicio permite conocer las fortalezas y los vacíos del grupo y, con esa información, orientar la planificación.",
+      "Una evaluación diagnóstica, pero aplicada mientras avanza la unidad, para detectar dificultades que vayan surgiendo y ajustar sobre la marcha.",
+      "Una evaluación sumativa, ya que busca medir el rendimiento final y poner una calificación al terminar."
     ], correct:1,
-    feedback:"Las tareas auténticas que simulan situaciones reales y evalúan tanto el proceso como el producto con rúbricas son la estrategia más coherente con la evaluación por competencias. Permiten evidenciar si el estudiante puede aplicar lo aprendido en contextos significativos. Aumentar la frecuencia de pruebas escritas no cambia el tipo de aprendizaje que se evalúa. Los trabajos de investigación individuales pueden ser útiles pero no garantizan la evidencia de competencias. La coevaluación es complementaria pero insuficiente como estrategia principal."
+    feedback:"La evaluación diagnóstica al inicio identifica fortalezas y vacíos y aporta información para planificar apoyos, agrupamientos y secuencias. La formativa acompaña el proceso, no lo precede; la diagnóstica durante el desarrollo no sirve para planificar antes de empezar; la sumativa mide el resultado final."
   },
 
-  // CASO 18 — Inclusión, NEE, planificación
+  // CASO 17
   {
     dim:"Planificación Pedagógica", dimClass:"dim-planificacion",
     area:"Área 2: Aplicación del currículo",
-    text:"Una docente recibe a un estudiante con Trastorno del Espectro Autista (TEA) que tiene dificultades con los cambios de rutina, la interpretación de consignas implícitas y la participación en actividades grupales no estructuradas. La docente desea adaptar su planificación para que el estudiante pueda participar plenamente en el aula. ¿Cuál de las siguientes adaptaciones es la más pertinente?",
+    text:"<span class='ak-m'>Al aplicar una evaluación diagnóstica al inicio de una unidad</span> de Lengua, una maestra descubre que el grupo tiene <span class='ak-p'>vacíos importantes en aprendizajes previos</span> que necesita para abordar el contenido nuevo. Comprende que, si avanza como si esos aprendizajes estuvieran logrados, una parte del grupo no podrá seguir y arrastrará las dificultades. Debe decidir cómo continuar con su planificación a partir de lo que mostró el diagnóstico. La maestra sabe que en primaria los aprendizajes se encadenan unos con otros y que avanzar sobre bases débiles termina por arrastrar las dificultades a lo largo del año. Por eso quiere que la información del diagnóstico se traduzca en decisiones concretas y no quede solo registrada en un cuaderno, atendiendo los vacíos sin renunciar a lo que el grado exige. <span class='ak-q'>¿Qué decisión de planificación sería la más adecuada en este caso?</span>",
     options:[
-      "Excluir al estudiante de las actividades grupales y asignarle tareas individuales equivalentes, para reducir su nivel de estrés y facilitar su concentración.",
-      "Mantener la planificación regular del aula sin modificaciones, pues las adaptaciones individuales podrían generar desigualdad entre los estudiantes del grupo.",
-      "Incorporar apoyos visuales para las rutinas y consignas, estructurar claramente las actividades grupales con roles definidos y anticipar los cambios de actividad con señales claras.",
-      "Solicitar a los padres que preparen al estudiante en casa antes de cada actividad escolar, para que llegue familiarizado con lo que se realizará durante la jornada."
-    ], correct:2,
-    feedback:"Los apoyos visuales, la estructuración clara de las actividades y la anticipación de los cambios son adaptaciones que responden directamente a las características del TEA y favorecen la participación plena sin excluir al estudiante. Excluirlo de actividades grupales limita su inclusión. Mantener la planificación sin adaptaciones ignora sus necesidades. Delegar la preparación a los padres transfiere al hogar una responsabilidad pedagógica que corresponde al docente."
-  },
-
-  // CASO 19 — Aprendizaje cooperativo genuino
-  {
-    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
-    area:"Área 3: Resultados de aprendizaje de los estudiantes",
-    text:"Una docente implementa trabajo en grupos en su clase, pero observa que en la mayoría de los grupos solo uno o dos estudiantes realizan el trabajo, mientras los demás no participan activamente. La docente quiere transformar esta dinámica en un aprendizaje cooperativo genuino donde todos los integrantes del grupo contribuyan y se beneficien. ¿Cuál estrategia es la más adecuada para lograrlo?",
-    options:[
-      "Pedir a cada grupo que entregue un producto final común, calificando al grupo como una unidad para fomentar que todos se involucren por igual.",
-      "Reducir el tamaño de los grupos a parejas para facilitar la supervisión docente y asegurar que ambos integrantes participen en la tarea.",
-      "Asignar roles específicos e interdependientes a cada integrante, diseñar la tarea de modo que el éxito grupal dependa de la contribución individual, y evaluar tanto el proceso como el producto.",
-      "Dejar que los propios grupos gestionen internamente la participación y resuelvan los conflictos de distribución del trabajo, interviniendo solo si el producto final no cumple los criterios."
-    ], correct:2,
-    feedback:"La asignación de roles interdependientes y el diseño de tareas donde el éxito grupal depende de la contribución de cada integrante crea la interdependencia positiva necesaria para el aprendizaje cooperativo genuino. Calificar solo el producto final como grupo no garantiza participación equitativa. Las parejas facilitan la supervisión pero no desarrollan habilidades de cooperación en grupos más amplios. Dejar que los grupos se gestionen solos no resuelve la falta de estructura que genera la participación desigual."
-  },
-
-  // CASO 20 — Motivación intrínseca y aprendizaje significativo
-  {
-    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
-    area:"Área 3: Resultados de aprendizaje de los estudiantes",
-    text:"Un docente observa que sus estudiantes de segundo ciclo completan las tareas pero muestran poco entusiasmo y curiosidad por los temas. Las actividades se perciben como obligaciones más que como oportunidades de aprendizaje. El docente desea replantear su práctica para fomentar la motivación intrínseca. ¿Cuál estrategia es la más apropiada?",
-    options:[
-      "Implementar un sistema de recompensas (puntos, premios, reconocimientos) para los estudiantes que completen las tareas con mayor calidad y puntualidad.",
-      "Aumentar la dificultad de las tareas progresivamente para generar un reto que mantenga el interés de los estudiantes a lo largo de las unidades.",
-      "Conectar los contenidos con preguntas genuinas de los estudiantes, permitirles tomar decisiones sobre cómo demostrar sus aprendizajes y vincular las tareas con situaciones de su vida cotidiana.",
-      "Reducir la cantidad de tareas asignadas y aumentar el tiempo disponible para que los estudiantes puedan completarlas con menor presión y mayor calidad."
-    ], correct:2,
-    feedback:"Conectar los contenidos con preguntas genuinas, dar autonomía para demostrar aprendizajes y vincular las tareas con la vida cotidiana son estrategias que nutren la motivación intrínseca al dar sentido y relevancia personal al aprendizaje. Los sistemas de recompensas fomentan la motivación extrínseca, que no sostiene el aprendizaje a largo plazo. Aumentar la dificultad puede generar ansiedad. Reducir tareas no aborda el problema de significado."
-  },
-
-  // CASO 21 — Pensamiento crítico
-  {
-    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
-    area:"Área 3: Resultados de aprendizaje de los estudiantes",
-    text:"Una docente de Ciencias Sociales observa que sus estudiantes aceptan la información sin cuestionarla y tienen dificultad para analizar diferentes perspectivas sobre un mismo hecho histórico. Desea desarrollar el pensamiento crítico en su clase. ¿Qué estrategia didáctica es la más apropiada para ese propósito?",
-    options:[
-      "Presentar un único relato histórico detallado y pedir a los estudiantes que lo memoricen y reproduzcan con fidelidad en evaluaciones escritas.",
-      "Proponer el análisis comparativo de fuentes primarias y secundarias con perspectivas distintas, guiando a los estudiantes para que identifiquen supuestos, contrasten evidencias y construyan su propia interpretación fundamentada.",
-      "Organizar debates espontáneos donde los estudiantes expresen libremente sus opiniones sobre los hechos históricos sin necesidad de argumentar con evidencias.",
-      "Proyectar documentales sobre los eventos históricos y pedir que los estudiantes elaboren resúmenes que demuestren comprensión del contenido."
+      "Continuar con la planificación tal como estaba, esperando que con el tiempo los niños superen solos esas dificultades.",
+      "Reajustar la planificación para reforzar primero los aprendizajes previos que faltan y, sobre esa base, avanzar luego al contenido nuevo, sin renunciar a las metas del grado.",
+      "Pasar por alto los aprendizajes previos y enfocarse solo en lo nuevo, porque es lo que figura en el programa.",
+      "Repetir el diagnóstico hasta que salgan mejores resultados, sin cambiar la planificación ni atender los vacíos."
     ], correct:1,
-    feedback:"El análisis comparativo de fuentes con perspectivas distintas, guiado para identificar supuestos y construir interpretaciones fundamentadas, es la estrategia más directamente orientada al desarrollo del pensamiento crítico. Memorizar un único relato refuerza la aceptación acrítica. Los debates sin argumentación con evidencias fomentan la opinión pero no el pensamiento crítico fundamentado. Los resúmenes de documentales desarrollan comprensión pero no el cuestionamiento de perspectivas."
+    feedback:"Reajustar la planificación para reforzar los aprendizajes previos antes de avanzar atiende las brechas detectadas sin renunciar a las metas del grado. Seguir sin ajustes o repetir el diagnóstico ignora la información; omitir los previos deja al grupo sin las bases necesarias."
   },
 
-  // CASO 22 — Planificación basada en diagnóstico
+  // CASO 18
   {
     dim:"Planificación Pedagógica", dimClass:"dim-planificacion",
     area:"Área 2: Aplicación del currículo",
-    text:"Una docente de Matemáticas aplica una evaluación diagnóstica al inicio del año y encuentra que una parte significativa del grupo presenta lagunas importantes en los contenidos del ciclo anterior que son prerrequisito para los nuevos aprendizajes. Otra parte del grupo domina esos contenidos y está lista para avanzar. ¿Cómo debería la docente ajustar su planificación en respuesta a estos resultados?",
+    text:"Un maestro de primaria quiere hacer sus clases más motivadoras e incorporar estrategias activas. Al analizar la situación, reconoce que <span class='ak-p'>su grupo es diverso: hay niños con distintos ritmos, distintos niveles de autonomía y acceso desigual a la tecnología</span>. Sabe que no toda estrategia novedosa es automáticamente adecuada: puede ser excelente en teoría y poco pertinente para ese grupo. Antes de decidir, quiere basar su elección en un análisis de su realidad. El maestro recuerda que el currículo del Nivel Primario promueve un aprendizaje activo y centrado en el niño, pero también sabe que una misma estrategia no funciona igual en todos los grupos. Quiere que su elección tenga fundamento, partiendo de cómo aprenden sus estudiantes y de las condiciones reales de su escuela, y no solo de lo que está de moda. <span class='ak-q'>¿Cómo debería seleccionar las estrategias metodológicas?</span>",
     options:[
-      "Comenzar la planificación desde los contenidos del grado actual sin modificaciones, ya que el currículo establece los aprendizajes que deben abordarse en ese nivel.",
-      "Dedicar las primeras semanas del año a repasar todos los contenidos del ciclo anterior con todo el grupo, antes de avanzar a los nuevos aprendizajes del grado.",
-      "Diseñar una planificación con trayectorias diferenciadas: actividades de consolidación y refuerzo para quienes presentan lagunas, y actividades de profundización para quienes ya dominan los prerrequisitos.",
-      "Solicitar a los padres de los estudiantes con lagunas que contraten apoyo externo para nivelarlos, de modo que todos comiencen en el mismo punto al inicio de las unidades."
-    ], correct:2,
-    feedback:"Diseñar trayectorias diferenciadas permite atender simultáneamente a quienes necesitan consolidar prerrequisitos y a quienes están listos para profundizar, sin sacrificar el avance de ningún grupo. Ignorar el diagnóstico perjudica a quienes tienen lagunas. Dedicar semanas enteras al repaso general perjudica a quienes ya están listos. Delegar la nivelación a apoyo externo transfiere al hogar una responsabilidad pedagógica."
+      "Usar casi siempre la clase expositiva y agregar de vez en cuando alguna actividad participativa.",
+      "Elegir las estrategias solo según el tiempo y los materiales que haya, sin tomar en cuenta las diferencias del grupo.",
+      "Concentrarse en cubrir todo el contenido y priorizar que memoricen, por encima de desarrollar habilidades y trabajo en equipo.",
+      "Partir de un análisis del grupo —sus características, sus formas de aprender y el contexto de la escuela— para escoger estrategias activas y pertinentes, como el juego, los proyectos o los retos cercanos a la vida de los niños."
+    ], correct:3,
+    feedback:"Seleccionar el enfoque a partir del análisis del grupo, sus formas de aprender y el contexto, optando por estrategias activas (juego, proyectos, retos cercanos), asegura una metodología pertinente y no solo novedosa. Elegir solo por recursos o priorizar la memorización ignora la diversidad y el propósito formativo."
   },
 
-  // CASO 23 — Lectura comprensiva estratégica
+  // CASO 19
   {
     dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
     area:"Área 3: Resultados de aprendizaje de los estudiantes",
-    text:"Un docente observa que sus estudiantes de cuarto grado pueden decodificar textos pero tienen dificultades para extraer la idea principal, hacer inferencias y relacionar la información con sus conocimientos previos. ¿Cuál estrategia de enseñanza es la más apropiada para desarrollar la comprensión lectora en sus estudiantes?",
+    text:"Una maestra de primaria suele devolver el trabajo de los niños con <span class='ak-p'>comentarios breves y generales, como 'bien', 'mejorable' o 'esfuérzate más'</span>, y nota que los mismos errores se repiten una y otra vez. Siente que su forma de evaluar se ha vuelto rutinaria y poco útil, y quiere un cambio de fondo en cómo devuelve el trabajo, para que la retroalimentación de verdad oriente el aprendizaje. La maestra sabe que, en estas edades, los niños necesitan saber con claridad qué hicieron bien y qué deben hacer a continuación para poder mejorar por sí mismos. Quiere dejar atrás los comentarios vagos y convertir la devolución del trabajo en un verdadero apoyo al aprendizaje, dado en un momento y de una forma que el niño pueda aprovechar. <span class='ak-q'>¿Qué enfoque de retroalimentación permitiría orientar con claridad los próximos pasos de aprendizaje?</span>",
     options:[
-      "Asignar mayor cantidad de lecturas para que los estudiantes aumenten su velocidad lectora y se familiaricen con distintos tipos de textos.",
-      "Enseñar explícitamente estrategias de comprensión lectora (como subrayar, formular preguntas, hacer predicciones y resumir), modelando su uso y brindando práctica guiada antes de la práctica independiente.",
-      "Pedir que los estudiantes lean el texto en silencio y luego respondan un cuestionario de comprensión para verificar qué comprendieron.",
-      "Leer los textos en voz alta para el grupo completo y luego comentar colectivamente el contenido, para asegurar que todos comprendan lo mismo."
-    ], correct:1,
-    feedback:"La enseñanza explícita de estrategias de comprensión lectora, con modelado y práctica guiada antes de la práctica independiente, es el enfoque más efectivo para desarrollar lectores estratégicos. Aumentar la cantidad de lecturas sin enseñar estrategias no desarrolla la comprensión. Los cuestionarios post-lectura evalúan la comprensión pero no la enseñan. Leer en voz alta y comentar colectivamente no garantiza que cada estudiante desarrolle las estrategias de forma autónoma."
+      "Señalar los errores, explicar por qué lo son y dar alguna orientación para mejorar, de modo que el niño vaya avanzando.",
+      "Poner sobre todo calificaciones y dejar los comentarios adicionales solo para quienes tuvieron dificultades.",
+      "Guardar la retroalimentación para la evaluación final, confiando en que aun así el niño tendrá ocasión de mejorar.",
+      "Conversar con el niño, en encuentros individuales o en pequeños grupos, reconociendo lo que hace bien y dándole indicaciones claras y concretas sobre los próximos pasos que debe dar para mejorar."
+    ], correct:3,
+    feedback:"La retroalimentación efectiva resalta lo logrado y ofrece indicaciones claras sobre los próximos pasos, dada de forma oportuna y en espacios de diálogo. Corregir y explicar es útil pero incompleto si no orienta qué hacer después; las notas no orientan; esperar a la evaluación final elimina la oportunidad de mejorar durante el proceso."
   },
 
-  // CASO 24 — Portafolio como herramienta de aprendizaje
+  // CASO 20
+  {
+    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
+    area:"Área 3: Resultados de aprendizaje de los estudiantes",
+    text:"En la clase de Matemática de segundo grado, una maestra acompaña a <span class='ak-c'>un niño con discalculia</span> que tiene mucha dificultad para entender las cantidades y, para salir del paso, <span class='ak-p'>memoriza pasos sin comprender qué significan</span>, de modo que se bloquea o se frustra apenas la tarea cambia un poco. La maestra quiere apoyarlo de una manera que no se limite a darle más tiempo, sino que le ayude a comprender de verdad los números. La maestra sabe que en segundo grado se construyen las nociones numéricas básicas que sostienen toda la Matemática posterior, y que un niño con discalculia necesita comprender, no solo aprobar. Quiere ofrecerle un apoyo que respete su ritmo y le permita construir el sentido de los números, en lugar de empujarlo a repetir procedimientos que no entiende. <span class='ak-q'>¿Qué apoyo favorecería mejor la comprensión de los conceptos numéricos?</span>",
+    options:[
+      "Darle más tiempo para las tareas con números y revisar su trabajo seguido, pero sin cambiar el tipo de actividad.",
+      "Pasarle material ya preparado o fotocopiado para que avance más rápido y no se atrase respecto al grupo.",
+      "Apoyarlo con materiales concretos —objetos para contar y agrupar, juegos, mediciones reales y dibujos— que le ayuden a entender los números y a pasar poco a poco de lo concreto a lo abstracto.",
+      "Mantener para él la misma planificación del grado, con el argumento de que así se respeta la equidad."
+    ], correct:2,
+    feedback:"Los materiales y representaciones concretas (contar y agrupar objetos, juegos, mediciones, dibujos) permiten pasar de lo concreto a lo abstracto y construir comprensión numérica, lo más pertinente ante la discalculia. Más tiempo sin cambiar la estrategia o material fotocopiado no atiende la dificultad; mantener la misma planificación ignora la necesidad específica."
+  },
+
+  // CASO 21
+  {
+    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
+    area:"Área 3: Resultados de aprendizaje de los estudiantes",
+    text:"Un maestro de primaria tiene en su grupo a <span class='ak-c'>un niño con discapacidad visual</span> que <span class='ak-p'>no puede seguir por sí mismo las actividades basadas en textos impresos</span> y depende de que sus compañeros le lean. Aunque el maestro repite las instrucciones en voz alta, no es suficiente: el niño termina dependiendo de los demás, lo que limita su autonomía. El maestro busca una adaptación que le permita acceder por sus propios medios. El maestro sabe que un objetivo central del Nivel Primario es que cada niño avance hacia la autonomía, y que depender siempre de un compañero limita ese desarrollo. Quiere una solución que el niño pueda usar de forma estable en el día a día y que le permita participar en las mismas actividades que el resto, sin quedar relegado a un papel secundario. <span class='ak-q'>¿Qué estrategia garantizaría su acceso al contenido junto al resto del grupo?</span>",
+    options:[
+      "Usar los mismos materiales con pequeños ajustes, esperando que el niño vaya creando por su cuenta sus propias maneras de arreglárselas.",
+      "Incorporar formatos alternativos para acceder al contenido —audios, lectores de pantalla u otras herramientas de lectura— que le permitan seguir las actividades por sí mismo, al mismo tiempo que el resto del grupo.",
+      "Liberarlo de las tareas que dependen de leer y dejarlo participar solo en actividades orales y en evaluaciones distintas.",
+      "Ponerle un compañero que le lea los textos en clase y, de vez en cuando, complementar con alguna herramienta tecnológica."
+    ], correct:1,
+    feedback:"Incorporar de forma sistemática formatos alternativos de acceso (audios, lectores de pantalla, herramientas de lectura) garantiza autonomía e inclusión real. El compañero tutor crea dependencia; eximirlo de la lectura limita su aprendizaje; esperar que desarrolle estrategias propias le transfiere una responsabilidad que es del docente."
+  },
+
+  // CASO 22
+  {
+    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
+    area:"Área 3: Resultados de aprendizaje de los estudiantes",
+    text:"En un grupo de primaria hay <span class='ak-c'>un niño con discapacidad auditiva</span> que se esfuerza por seguir las clases, pero <span class='ak-p'>pierde gran parte de la información que se da de forma oral</span>: consignas, explicaciones y conversaciones en grupo. Cuando llega el momento de trabajar, no cuenta con toda la información y queda en desventaja, a pesar de su empeño. El maestro quiere asegurar su acceso al contenido y su participación activa. El maestro sabe que mucha de la información de una clase de primaria circula de forma oral —consignas, explicaciones, conversaciones— y que ahí está justo la barrera para este niño. Quiere asegurarse de que reciba la misma información que sus compañeros y pueda participar activamente, no solo estar presente en el aula. <span class='ak-q'>¿Cuál sería el conjunto de apoyos más pertinente?</span>",
+    options:[
+      "Sentarlo cerca del maestro y procurar hablar más fuerte, sumando algún apoyo visual de vez en cuando en la pizarra.",
+      "Usar de vez en cuando apoyos visuales y resúmenes escritos, manteniendo por lo demás la clase como siempre.",
+      "Reducir por un tiempo su participación en las actividades en grupo para no atrasar al curso, compensándolo con ejercicios de refuerzo aparte.",
+      "Usar de manera permanente apoyos en varios canales —imágenes y consignas visuales, resúmenes escritos, demostraciones y videos con subtítulos o lengua de señas— y ajustar la dinámica de la clase para que participe activamente y en igualdad."
+    ], correct:3,
+    feedback:"Incorporar apoyos en varios canales de forma sistemática y ajustar las interacciones garantiza el acceso continuo y la participación activa. Los apoyos ocasionales son insuficientes; sentarlo cerca ayuda pero no resuelve el acceso a toda la información; limitar su participación lo excluye en lugar de incluirlo."
+  },
+
+  // CASO 23
   {
     dim:"Planificación Pedagógica", dimClass:"dim-planificacion",
     area:"Área 2: Aplicación del currículo",
-    text:"Una docente quiere implementar el portafolio de aprendizaje como herramienta de evaluación en su clase. Sin embargo, no está segura de cómo diseñarlo para que sea verdaderamente formativo y no se convierta en un simple álbum de trabajos. ¿Cuál de las siguientes características es la más importante para que el portafolio sea una herramienta de aprendizaje auténtica?",
+    text:"Una maestra de primaria cuenta con varios recursos para sus clases —láminas, juegos, una tableta, audios y materiales para manipular—. Sin embargo, observa que <span class='ak-p'>no todos los niños los aprovechan por igual</span>, por sus distintas formas de aprender y por un acceso desigual a la tecnología fuera de la escuela. Quiere garantizar que todos accedan a la información en condiciones equitativas. La maestra sabe que sus estudiantes aprenden de maneras distintas y que un solo tipo de recurso siempre deja a alguien fuera. Quiere combinar lo que tiene de modo que cada niño encuentre una vía para acceder a la información, cuidando especialmente que quienes no disponen de tecnología en casa no queden en desventaja dentro del aula. <span class='ak-q'>¿Qué combinación de recursos garantizaría ese acceso equitativo a la información?</span>",
     options:[
-      "Incluir la mayor cantidad posible de trabajos realizados durante el período para demostrar el volumen de producción del estudiante.",
-      "Incluir solo los mejores trabajos del estudiante para mostrar sus logros más destacados al finalizar el período.",
-      "Incluir evidencias seleccionadas por el estudiante, acompañadas de reflexiones sobre su propio proceso de aprendizaje, los avances logrados y los aspectos a mejorar.",
-      "Incluir trabajos calificados por el docente con sus comentarios correctivos, ordenados cronológicamente para mostrar la progresión de las calificaciones."
+      "Aprovechar los dispositivos de quienes los tienen para los recursos digitales y emparejarlos con quienes no los poseen.",
+      "Usar la tableta y algún material adaptado, pero conservando la misma planificación digital para todos y dejando las opciones en papel solo para cuando alguien no tenga acceso.",
+      "Ofrecer una variedad de recursos —láminas, juegos, audios, materiales manipulables y algún recurso digital— combinados con opciones que no requieran tecnología, para que todos los niños accedan a la información por igual.",
+      "Apoyarse sobre todo en los libros y las explicaciones orales y usar la tecnología solo cuando esté disponible, para no crear desigualdades."
     ], correct:2,
-    feedback:"La característica más importante del portafolio como herramienta formativa es la reflexión del propio estudiante sobre su proceso de aprendizaje. Sin reflexión metacognitiva, el portafolio es solo una colección de documentos. Incluir la mayor cantidad de trabajos prioriza la cantidad sobre la calidad reflexiva. Incluir solo los mejores trabajos no muestra el proceso. Los trabajos calificados con comentarios son útiles pero no fomentan la autoregulación si el estudiante no reflexiona."
+    feedback:"Combinar recursos variados (láminas, juegos, audios, materiales manipulables y algún recurso digital) con opciones que no dependan de la tecnología garantiza un acceso pleno y equitativo según las distintas formas de aprender. Depender de los dispositivos de casa amplía la brecha; una sola planificación digital asume que todos acceden igual; usar solo lo impreso desaprovecha otros recursos."
   },
 
-  // CASO 25 — Dificultad de escritura, planificación textual
-  {
-    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
-    area:"Área 3: Resultados de aprendizaje de los estudiantes",
-    text:"Una docente observa que sus estudiantes tienen dificultades para estructurar sus escritos: los textos presentan ideas desorganizadas, sin coherencia entre párrafos, y muchos no distinguen entre introducción, desarrollo y conclusión. ¿Qué estrategia didáctica favorece más el desarrollo de la estructura textual en los estudiantes?",
-    options:[
-      "Pedir a los estudiantes que escriban textos largos frecuentemente, confiando en que con la práctica mejorarán naturalmente su organización.",
-      "Enseñar la estructura textual mediante organizadores gráficos (mapas conceptuales, esquemas de escritura), modelar el proceso de planificación antes de escribir y dar retroalimentación específica sobre la organización del texto.",
-      "Corregir todos los errores de estructura en los textos de los estudiantes y devolvérselos para que los pasen en limpio incorporando las correcciones.",
-      "Proporcionar plantillas con las secciones del texto ya identificadas para que los estudiantes solo deban completarlas con el contenido correspondiente."
-    ], correct:1,
-    feedback:"Los organizadores gráficos, el modelado del proceso de planificación y la retroalimentación específica sobre la organización son las estrategias más efectivas para desarrollar la estructura textual. La práctica extensiva sin instrucción explícita no garantiza mejora en la estructura. Corregir y pedir que se pase en limpio no enseña el proceso de planificación. Las plantillas facilitan la estructura pero pueden generar dependencia sin desarrollar la capacidad autónoma de organizar textos."
-  },
-
-  // CASO 26 — Evaluación diagnóstica al inicio de unidad
+  // CASO 24
   {
     dim:"Planificación Pedagógica", dimClass:"dim-planificacion",
     area:"Área 2: Aplicación del currículo",
-    text:"Antes de iniciar una nueva unidad de aprendizaje, un docente quiere conocer los conocimientos previos y las concepciones que sus estudiantes tienen sobre el tema para ajustar su planificación. ¿Qué tipo de evaluación y qué instrumento serían los más apropiados para este propósito?",
+    text:"En una escuela primaria con <span class='ak-c'>acceso limitado y poco confiable a internet</span>, un maestro quiere usar la tecnología de manera significativa. Su intención no es solo proyectar información, sino que la tecnología <span class='ak-p'>ayude a que los niños piensen, exploren y razonen, y no solo reciban contenidos</span>. Como la conexión falla a menudo, necesita un uso que funcione incluso sin internet. El maestro sabe que la tecnología puede ser una herramienta poderosa para pensar, pero también puede quedarse en simple pantalla si solo se usa para mostrar información. En un contexto donde la conexión no es confiable, quiere un uso que no dependa de internet y que mantenga a los niños en el centro, explorando y razonando con apoyo. <span class='ak-q'>¿Qué uso de la tecnología sería el más adecuado en este contexto?</span>",
     options:[
-      "Una evaluación sumativa con una prueba escrita formal que permita calificar el nivel de conocimiento del grupo antes de iniciar la unidad.",
-      "Una evaluación diagnóstica usando instrumentos variados como preguntas abiertas, lluvias de ideas, mapas conceptuales o situaciones problemas, para identificar qué saben y qué concepciones tienen los estudiantes.",
-      "Una evaluación formativa que se aplique durante el desarrollo de las primeras actividades de la unidad, para ir ajustando la enseñanza en tiempo real.",
-      "Una evaluación por competencias con tareas auténticas que evidencien lo que los estudiantes son capaces de hacer con los conocimientos previos que tienen."
-    ], correct:1,
-    feedback:"La evaluación diagnóstica con instrumentos variados e informales (preguntas abiertas, lluvias de ideas, mapas conceptuales) es la más apropiada para explorar conocimientos previos y concepciones antes de iniciar una unidad. La evaluación sumativa al inicio asigna calificaciones innecesariamente. La evaluación formativa durante las primeras actividades es útil pero no sirve para planificar la unidad antes de comenzarla. La evaluación por competencias es más adecuada al finalizar, no al inicio."
+      "Usar la tecnología solo como apoyo de vez en cuando, ligada a tareas estructuradas pensadas para desarrollar el pensamiento.",
+      "Reemplazar la explicación del maestro por videos y presentaciones como recurso principal, reduciendo el acompañamiento.",
+      "Destinar los dispositivos a mostrar diapositivas con información, dando prioridad a transmitir contenidos.",
+      "Aprovechar herramientas que funcionen sin conexión para explorar situaciones reales del entorno, hacerse preguntas y buscar respuestas con apoyo del maestro, desarrollando el pensamiento aun sin internet estable."
+    ], correct:3,
+    feedback:"Integrar recursos que funcionen sin conexión para explorar el entorno, preguntarse y buscar respuestas con evidencia desarrolla el pensamiento de forma pertinente al contexto. Usar la tecnología solo de vez en cuando, sustituir al maestro o destinarla a transmitir contenidos no promueve el razonamiento que se busca."
   },
 
-  // CASO 27 — Aprendizaje por indagación
+  // CASO 25
   {
     dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
     area:"Área 3: Resultados de aprendizaje de los estudiantes",
-    text:"Una docente de Ciencias Naturales desea que sus estudiantes de segundo ciclo comprendan el ciclo del agua no solo como una secuencia de procesos, sino como un fenómeno dinámico que pueden observar y analizar. ¿Qué estrategia de enseñanza favorece mejor esta comprensión?",
+    text:"Al trabajar conceptos abstractos en la clase de Matemática, una maestra nota que los niños responden de maneras muy distintas: algunos comprenden con facilidad, pero <span class='ak-p'>otros se frustran y memorizan los procedimientos sin entender su significado</span>. La maestra busca una estrategia que permita a todo el grupo acercarse a esos conceptos de varias formas —representándolos, manipulándolos y explorándolos— para que la comprensión sea real y no una repetición que se olvida pronto. La maestra sabe que en primaria los conceptos abstractos se comprenden mejor cuando los niños pueden verlos, tocarlos y representarlos de varias maneras. Le preocupa que quienes hoy memorizan sin entender arrastren esa dificultad a grados superiores, por lo que busca que la comprensión se construya desde lo concreto y con sentido. <span class='ak-q'>¿Qué estrategia favorecería una comprensión significativa de estos conceptos?</span>",
     options:[
-      "Presentar el ciclo del agua con un esquema en la pizarra y pedir que los estudiantes lo copien y memoricen para reproducirlo en la evaluación.",
-      "Proyectar un video sobre el ciclo del agua y luego organizar una discusión grupal donde los estudiantes identifiquen los pasos del proceso.",
-      "Diseñar experiencias de indagación donde los estudiantes observen, planteen preguntas, formulen hipótesis y comprueben los procesos del ciclo del agua a través de experimentos sencillos.",
-      "Asignar una lectura sobre el ciclo del agua y pedir que los estudiantes elaboren un resumen con sus propias palabras para verificar la comprensión del texto."
-    ], correct:2,
-    feedback:"Las experiencias de indagación con observación, preguntas, hipótesis y experimentación permiten a los estudiantes construir una comprensión activa y significativa del ciclo del agua como fenómeno dinámico. Copiar y memorizar el esquema no promueve comprensión profunda. El video con discusión promueve comprensión conceptual pero no la construcción activa del conocimiento. El resumen de lectura desarrolla comprensión de un texto pero no la comprensión del fenómeno en sí."
+      "Aplicar evaluaciones formativas periódicas para detectar las brechas y dar refuerzos puntuales, pero sin cambiar la forma de enseñar.",
+      "Diseñar trabajo de lápiz y papel con esquemas y dibujos y algún material para manipular, con ejercicios graduados que repasen los pasos.",
+      "Dar explicaciones orales bien estructuradas, con apoyos visuales y ejemplos de la maestra, y promover que repitan los pasos de forma guiada.",
+      "Integrar de manera planificada materiales concretos, juegos y recursos manipulables que permitan explorar, representar y manipular los conceptos de varias formas, para construir una comprensión real y no solo memorizada."
+    ], correct:3,
+    feedback:"Integrar materiales concretos, juegos y recursos manipulables que permitan explorar y representar los conceptos de varias formas atiende la diversidad y favorece la comprensión significativa, superando la memorización. Las evaluaciones sin cambiar el enfoque o las explicaciones para repetir no abordan la construcción de significado."
   },
 
-  // CASO 28 — Gestión del aula heterogénea
+  // CASO 26
   {
     dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
     area:"Área 3: Resultados de aprendizaje de los estudiantes",
-    text:"Un docente trabaja con un grupo heterogéneo donde conviven estudiantes con diferentes niveles de desempeño, estilos de aprendizaje y necesidades de apoyo. Le resulta difícil atender a todos simultáneamente y siente que sus explicaciones son demasiado básicas para algunos y demasiado avanzadas para otros. ¿Qué estrategia de gestión del aula le permitiría atender mejor la diversidad del grupo?",
+    text:"Un maestro de primaria detecta que sus estudiantes <span class='ak-p'>tienen dificultades tanto para expresarse al hablar como al escribir</span>: les cuesta contar lo que piensan, escribir con orden y participar, por lo que intervienen poco. El maestro quiere fortalecer ambas habilidades de forma progresiva, con actividades variadas que incluyan a todos según su nivel y posibilidades. El maestro sabe que hablar y escribir con claridad son aprendizajes fundamentales del Nivel Primario y que se desarrollan con práctica frecuente y variada, no de un día para otro. Quiere que todos los niños participen y ganen confianza, ofreciendo distintas formas de expresarse para que cada uno avance desde donde se encuentra. <span class='ak-q'>¿Qué estrategia desarrollaría mejor la expresión oral y escrita del grupo?</span>",
     options:[
-      "Dividir permanentemente el grupo en subgrupos por nivel de desempeño y diseñar actividades distintas para cada subgrupo, asegurándose de que cada uno trabaje a su propio ritmo.",
-      "Diseñar actividades con múltiples puntos de entrada y salida, donde todos los estudiantes trabajen el mismo contenido pero con niveles de complejidad, apoyo y autonomía diferenciados.",
-      "Centrar la enseñanza en el nivel promedio del grupo, ofreciendo actividades de refuerzo a quienes presentan dificultades después de la clase y actividades de enriquecimiento a quienes terminan antes.",
-      "Solicitar apoyo de los estudiantes más avanzados para que expliquen los contenidos a sus compañeros con mayores dificultades, mientras el docente trabaja con el resto del grupo."
+      "Dejar que participen al hablar solo los niños que ya se expresan con soltura, para no presionar a los demás.",
+      "Proponer de forma progresiva actividades como contar cuentos, dramatizaciones, conversaciones, descripción de imágenes y escritura sencilla, involucrando a todos según su nivel y posibilidades.",
+      "Reducir las actividades de hablar y escribir para que los niños no se sientan presionados ni expuestos.",
+      "Pedir que memoricen textos modelo, sin analizarlos ni elaborar ideas propias."
     ], correct:1,
-    feedback:"Diseñar actividades con múltiples puntos de entrada y salida que mantengan el mismo contenido pero diferencien la complejidad, el apoyo y la autonomía es la estrategia más inclusiva para gestionar la heterogeneidad. La agrupación permanente por nivel puede generar etiquetas y limitar el desarrollo. Centrar en el promedio excluye a los extremos. Usar a los estudiantes avanzados como tutores permanentes puede ser útil ocasionalmente pero no es una estrategia sistemática adecuada."
+    feedback:"Proponer actividades variadas y progresivas de expresión oral y escrita (contar, dramatizar, conversar, describir, escribir), involucrando a todos según su nivel, fortalece ambas habilidades. Limitar la participación a los más fluidos excluye; reducir las actividades priva de práctica; memorizar no desarrolla la producción propia."
   },
 
-  // CASO 29 — Tecnología educativa y aprendizaje activo
+  // CASO 27
   {
     dim:"Planificación Pedagógica", dimClass:"dim-planificacion",
     area:"Área 2: Aplicación del currículo",
-    text:"Un docente desea incorporar herramientas digitales en su clase para hacer las actividades más interactivas y relevantes. Sin embargo, nota que cuando usa la tecnología, los estudiantes se distraen con otras aplicaciones o redes sociales. ¿Qué estrategia permitiría integrar la tecnología de forma que potencie el aprendizaje activo?",
+    text:"<span class='ak-m'>Al planificar una nueva unidad</span> en segundo grado, una maestra comprueba, a partir del diagnóstico, que <span class='ak-p'>los aprendizajes anteriores no están consolidados de la misma manera en todo el grupo</span>: unos niños dominan lo básico y otros aún tienen vacíos. Sabe que avanzar directo a lo más complejo dejaría atrás a una parte, pero tampoco quiere detener a quienes ya están listos. Debe decidir cómo organizar la secuencia. La maestra sabe que en segundo grado conviene partir de lo que los niños ya dominan e ir subiendo el nivel poco a poco, para que nadie se quede atrás ni se aburra. Quiere que la secuencia tenga una lógica clara y que cada actividad prepare la siguiente, conectando lo nuevo con situaciones cercanas para que cobre sentido. <span class='ak-q'>¿Cómo debería diseñar la secuencia de aprendizaje?</span>",
     options:[
-      "Prohibir el uso de dispositivos personales en el aula y utilizar únicamente los recursos tecnológicos disponibles en el centro educativo bajo supervisión directa del docente.",
-      "Usar la tecnología exclusivamente para presentar contenidos (presentaciones, videos), ya que es la forma más eficiente de aprovechar el tiempo de clase.",
-      "Diseñar actividades con tecnología que requieran la producción activa de los estudiantes (crear, investigar, resolver problemas), estableciendo criterios claros y propósitos explícitos para el uso del dispositivo.",
-      "Integrar la tecnología al final de las unidades como actividad de repaso o gamificación, para mantener la motivación una vez cubiertos los contenidos principales."
-    ], correct:2,
-    feedback:"Diseñar actividades que requieran producción activa (crear, investigar, resolver problemas) con propósitos explícitos y criterios claros encausa la atención hacia el aprendizaje y reduce la distracción. Prohibir los dispositivos personales puede ser contraproducente en contextos donde son recursos valiosos. Usar la tecnología solo para presentar contenidos la reduce a un recurso pasivo. Limitarla al final de las unidades como repaso no aprovecha su potencial durante el proceso."
-  },
-
-  // CASO 30 — Desarrollo del vocabulario académico
-  {
-    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
-    area:"Área 3: Resultados de aprendizaje de los estudiantes",
-    text:"Una docente observa que sus estudiantes de primer ciclo tienen un vocabulario limitado que les dificulta comprender los textos de las distintas áreas y expresar sus ideas con precisión. Desea desarrollar el vocabulario de sus estudiantes de forma sistemática e integrada en todas las áreas. ¿Cuál estrategia es la más apropiada?",
-    options:[
-      "Pedir a los estudiantes que memoricen listas de palabras nuevas cada semana y las usen en oraciones para demostrar que las conocen.",
-      "Exponer a los estudiantes a palabras nuevas en contextos significativos, enseñar estrategias para deducir el significado, ofrecer múltiples oportunidades de uso oral y escrito, y conectar el nuevo vocabulario con lo ya conocido.",
-      "Leer un cuento en voz alta diariamente para que los estudiantes se familiaricen con nuevo vocabulario a través de la escucha repetida.",
-      "Proporcionar un glosario con las palabras clave de cada unidad para que los estudiantes las consulten cuando no entiendan algún término."
+      "Quedarse en las nociones básicas y no introducir nada nuevo, para que los niños no se sientan abrumados.",
+      "Planificar actividades que vayan de menos a más, empezando por repasar lo simple y avanzando hacia tareas más complejas, conectadas con situaciones cercanas para que cobren sentido.",
+      "Mezclar los temas de la asignatura con otros distintos para que la clase sea más entretenida, considerándolo una adaptación curricular.",
+      "Empezar directo por las tareas más difíciles, suponiendo que recordarán lo anterior sin necesidad de repaso."
     ], correct:1,
-    feedback:"El desarrollo del vocabulario es más efectivo cuando las palabras se aprenden en contextos significativos, con múltiples exposiciones, estrategias activas de comprensión y uso oral y escrito. Memorizar listas sin contexto no garantiza la comprensión ni el uso. La lectura en voz alta es positiva pero insuficiente si no hay instrucción explícita. El glosario es un recurso de referencia útil pero pasivo que no desarrolla el vocabulario de forma activa."
+    feedback:"Diseñar actividades progresivas que partan de lo simple y avancen hacia lo complejo, conectadas con situaciones cercanas, articula la secuencia con sentido y atiende a quienes tienen vacíos. Quedarse en lo básico no avanza; mezclar temas sin articulación fragmenta; iniciar con lo complejo ignora los vacíos."
   },
 
-  // CASO 31 — Resolución de conflictos en el aula
+  // CASO 28
   {
     dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
     area:"Área 3: Resultados de aprendizaje de los estudiantes",
-    text:"Una docente observa que en su aula se presentan frecuentes conflictos entre estudiantes que interrumpen el proceso de aprendizaje. Los conflictos suelen escalar porque los estudiantes no tienen herramientas para resolverlos de forma constructiva. La docente desea abordar esta situación de manera pedagógica. ¿Cuál estrategia es la más apropiada?",
+    text:"Una maestra de primaria quiere ayudar a sus estudiantes a recordar y comprender mejor lo que aprenden, en un grupo donde <span class='ak-p'>conviven niños con distintos niveles de avance</span>. Sabe que repetir la información de memoria, además de no durar, aburre y desmotiva. Por eso busca una estrategia que les ayude a organizar y retener la información de forma significativa y que, a la vez, despierte su creatividad. La maestra sabe que pedir a los niños que memoricen sin comprender rara vez deja aprendizajes duraderos, y que en primaria la creatividad es una gran aliada para aprender. Quiere una estrategia que les ayude a organizar lo que estudian y, a la vez, a apropiarse de ello creando algo propio, de modo que recuerden porque entendieron. <span class='ak-q'>¿Qué estrategia integraría memoria y creatividad de forma efectiva?</span>",
     options:[
-      "Aplicar sanciones inmediatas a los estudiantes involucrados en los conflictos para disuadir comportamientos disruptivos y mantener el orden en el aula.",
-      "Ignorar los conflictos menores para no darles relevancia y atender únicamente aquellos que afectan gravemente el orden de la clase.",
-      "Enseñar explícitamente habilidades de resolución de conflictos (escucha activa, expresión asertiva, negociación), crear espacios para practicarlas y establecer protocolos de mediación en el aula.",
-      "Reorganizar los grupos de trabajo para separar a los estudiantes que generan conflictos, asegurándose de que no interactúen durante las actividades."
-    ], correct:2,
-    feedback:"Enseñar explícitamente habilidades de resolución de conflictos y establecer protocolos de mediación desarrolla en los estudiantes las herramientas socioemocionales necesarias para gestionar los conflictos de forma autónoma y constructiva. Las sanciones inmediatas no desarrollan habilidades. Ignorar los conflictos menores permite que escalen. Reorganizar los grupos para evitar el contacto es una solución temporal que no aborda la causa del problema."
-  },
-
-  // CASO 32 — Lectura en voz alta y comprensión
-  {
-    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
-    area:"Área 3: Resultados de aprendizaje de los estudiantes",
-    text:"Una docente implementa lecturas orales en clase donde cada estudiante lee un párrafo en voz alta por turno. Observa que quienes leen bien lo hacen fluidamente, pero que los estudiantes con dificultades lectoras se angustian al saber que les toca leer, lo que afecta su participación y su relación con la lectura. ¿Qué modificación sería más apropiada para esta práctica?",
-    options:[
-      "Mantener la misma dinámica pero reducir el tiempo que le corresponde leer a los estudiantes con dificultades para minimizar su exposición.",
-      "Eliminar la lectura oral de la clase y reemplazarla completamente por lectura silenciosa individual para eliminar la presión.",
-      "Rediseñar la actividad de lectura oral para que incluya práctica previa, lectura en parejas o en coro, y otros formatos que reduzcan la presión individual y conviertan la lectura en una experiencia positiva.",
-      "Eximir a los estudiantes con dificultades lectoras de la lectura oral y asignarles una tarea alternativa mientras sus compañeros leen."
-    ], correct:2,
-    feedback:"Rediseñar la actividad para incluir práctica previa, lectura en parejas o en coro reduce la presión individual y transforma la lectura oral en una experiencia positiva y formativa. Reducir el tiempo de exposición no elimina la ansiedad. Eliminar la lectura oral priva a todos de una práctica valiosa. Eximir a los estudiantes con dificultades los excluye de la actividad y refuerza la idea de que no pueden lograrlo."
-  },
-
-  // CASO 33 — Retroalimentación entre pares
-  {
-    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
-    area:"Área 3: Resultados de aprendizaje de los estudiantes",
-    text:"Un docente quiere implementar la retroalimentación entre pares en su clase. Ha notado que cuando lo ha intentado antes, los estudiantes se limitan a decirse 'está bien' o a señalar errores superficiales sin dar comentarios útiles. ¿Cómo puede el docente hacer que la retroalimentación entre pares sea más efectiva?",
-    options:[
-      "Pedir que los estudiantes califiquen numéricamente el trabajo de su compañero según su criterio personal, para que el docente pueda promediar las notas del grupo.",
-      "Proporcionar a los estudiantes criterios claros de evaluación y una estructura guiada para dar retroalimentación, modelar ejemplos de retroalimentación efectiva y practicar en situaciones de bajo riesgo antes de aplicarla a trabajos importantes.",
-      "Dejar que los estudiantes retroalimenten libremente a sus compañeros sin estructura, confiando en que la práctica repetida mejorará gradualmente la calidad de los comentarios.",
-      "Limitar la retroalimentación entre pares a aspectos formales del trabajo (presentación, ortografía) para evitar juicios sobre el contenido que puedan desmotivar a los estudiantes."
+      "Hacer que copien definiciones una y otra vez, sin llevar lo aprendido a actividades prácticas o creativas.",
+      "Usar esquemas, dibujos y mapas sencillos para organizar la información y, a la vez, proponer que creen productos o representaciones a partir de lo aprendido, uniendo memoria y creatividad.",
+      "Repetir la información en voz alta muchas veces, esperando que la memoricen sin conectarla con lo que ya saben.",
+      "Evaluar con pruebas de marcar centradas en la memoria, sin actividades de aplicación ni de resolución de problemas."
     ], correct:1,
-    feedback:"Proporcionar criterios claros, una estructura guiada, modelar la retroalimentación efectiva y practicar en contextos de bajo riesgo son las condiciones necesarias para que la retroalimentación entre pares sea pedagógicamente valiosa. Las calificaciones numéricas sin criterios no constituyen retroalimentación útil. La práctica repetida sin estructura no mejora la calidad de los comentarios. Limitar la retroalimentación a aspectos formales excluye el contenido más relevante para el aprendizaje."
+    feedback:"Los esquemas, dibujos y mapas sencillos para organizar la información, combinados con la creación de productos o representaciones, estimulan a la vez la memoria significativa y la creatividad, y favorecen el aprendizaje entre niños de distintos niveles. Copiar o repetir definiciones, o evaluar solo la memoria, refuerza la retención mecánica."
   },
 
-  // CASO 34 — Enseñanza de la resolución de problemas matemáticos
-  {
-    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
-    area:"Área 3: Resultados de aprendizaje de los estudiantes",
-    text:"Un docente de Matemáticas observa que sus estudiantes aplican procedimientos correctamente cuando los ejercicios son similares a los que practicaron, pero no saben cómo empezar cuando se les presenta un problema con una estructura diferente o con datos presentados de otra manera. ¿Qué estrategia didáctica desarrolla mejor la capacidad de resolver problemas matemáticos en situaciones nuevas?",
-    options:[
-      "Aumentar la cantidad de ejercicios de práctica con variaciones de los mismos tipos de problemas para que los estudiantes automaticen los procedimientos.",
-      "Enseñar explícitamente estrategias generales de resolución de problemas (leer y comprender, identificar datos, planificar, ejecutar y verificar), modelar el proceso de pensamiento en voz alta y exponer a los estudiantes a problemas de estructura variada.",
-      "Presentar solo problemas con la estructura exacta que los estudiantes deben dominar para el nivel, evitando variaciones que puedan generar confusión.",
-      "Pedir a los estudiantes que expliquen verbalmente cómo resolverían un problema antes de hacerlo, para que el docente pueda corregir su plan antes de que cometan errores."
-    ], correct:1,
-    feedback:"Enseñar estrategias generales de resolución de problemas, modelar el proceso de pensamiento en voz alta y exponer a los estudiantes a problemas de estructura variada desarrolla la flexibilidad cognitiva necesaria para resolver situaciones nuevas. La práctica repetida de ejercicios similares desarrolla habilidad procedimental pero no transferencia. Limitar a un solo tipo de estructura evita el error pero impide el desarrollo de la adaptabilidad. La verbalización previa es útil pero no sustituye la enseñanza de estrategias."
-  },
-
-  // CASO 35 — Aprendizaje por proyectos interdisciplinario
+  // CASO 29
   {
     dim:"Planificación Pedagógica", dimClass:"dim-planificacion",
     area:"Área 2: Aplicación del currículo",
-    text:"Un equipo de docentes de distintas asignaturas desea implementar un proyecto interdisciplinario para que los estudiantes de tercer ciclo integren conocimientos de Lengua, Ciencias, Matemáticas y Arte en torno a una problemática ambiental de la comunidad. ¿Cuál elemento es más importante para garantizar la coherencia pedagógica del proyecto?",
+    text:"En una escuela primaria de zona rural, <span class='ak-c'>el internet es escaso e intermitente y los materiales disponibles son pocos y están desactualizados</span>. Un maestro necesita sostener los aprendizajes de su grupo sin depender de recursos con los que no cuenta. En lugar de lamentar las carencias, piensa en lo que sí tiene: el entorno, la comunidad, los saberes locales y las situaciones del día a día, que pueden convertirse en recursos para enseñar. El maestro sabe que el currículo permite y recomienda contextualizar los aprendizajes, y que la comunidad rural ofrece un sinfín de recursos para enseñar de forma significativa. En lugar de ver las carencias como un obstáculo insalvable, quiere convertir el entorno en su mejor material didáctico, sin que la falta de conexión limite lo que sus estudiantes pueden aprender. <span class='ak-q'>¿Qué estrategia didáctica aprovecharía mejor los recursos del entorno?</span>",
     options:[
-      "Que cada docente diseñe su parte del proyecto de forma independiente y los estudiantes realicen actividades distintas en cada asignatura con el mismo tema de fondo.",
-      "Que los docentes acuerden una situación problema significativa como hilo conductor, definan competencias integradas, planifiquen colaborativamente y diseñen una evaluación común del producto.",
-      "Que el proyecto sea liderado por el docente de Ciencias, ya que la problemática ambiental corresponde principalmente a esa área del conocimiento.",
-      "Que los estudiantes elijan libremente cómo abordar la problemática en cada asignatura, para fomentar la autonomía y la creatividad en el proceso de integración."
-    ], correct:1,
-    feedback:"La coherencia pedagógica de un proyecto interdisciplinario requiere una situación problema compartida como hilo conductor, competencias integradas acordadas entre los docentes, planificación colaborativa y evaluación común. La planificación independiente por asignaturas produce actividades paralelas sin integración real. La concentración del liderazgo en una sola asignatura excluye las demás. La libre elección sin estructura no garantiza la integración interdisciplinaria."
+      "Pedir que busquen información en internet y dar alternativas solo a quienes no tengan dispositivos o conexión.",
+      "Recortar los contenidos del grado y evitar los temas difíciles para que los niños no enfrenten complicaciones.",
+      "Seguir al pie de la letra los recursos digitales que sugiere el currículo sin adaptarlos, aunque los niños no puedan acceder a ellos.",
+      "Diseñar actividades que aprovechen lo que ofrece la comunidad y el entorno —observar la naturaleza y los oficios del lugar, experimentar y hacer recorridos por el contexto local— para afianzar los aprendizajes sin depender de la conexión."
+    ], correct:3,
+    feedback:"Diseñar actividades que aprovechen los recursos de la comunidad y el entorno (observación, experimentación, recorridos por el contexto local) garantiza aprendizajes de calidad, adaptando el currículo sin desvirtuarlo. Exigir búsquedas en internet o seguir recursos sin acceso real genera inequidad; recortar contenidos empobrece."
   },
 
-  // CASO 36 — Metacognición y autorregulación del aprendizaje
+  // CASO 30
   {
     dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
     area:"Área 3: Resultados de aprendizaje de los estudiantes",
-    text:"Un docente observa que sus estudiantes frecuentemente no saben cómo estudiar, no identifican qué no comprenden y no ajustan sus estrategias cuando algo no les funciona. Desea desarrollar la capacidad de autorregulación del aprendizaje en su grupo. ¿Qué estrategia es la más apropiada?",
+    text:"En una actividad en la que los niños revisan el trabajo de un compañero, una maestra observa que <span class='ak-p'>el niño con más facilidad corrige al otro de forma brusca y burlona</span>, lo que desanima a su compañero, que termina cerrándose. La maestra valora que los niños se evalúen entre sí, pero ve que no saben hacerlo y que necesita enseñarles a dar comentarios de forma respetuosa y útil. La maestra sabe que evaluarse entre compañeros es valioso, pero que en estas edades hay que enseñar a hacerlo: los niños aún no saben cómo dar una opinión que ayude sin lastimar. Quiere aprovechar la situación para enseñar a comentar con respeto y a recibir comentarios sin desanimarse, cuidando la confianza de ambos niños. <span class='ak-q'>¿Cuál sería la intervención más adecuada en esta situación?</span>",
     options:[
-      "Entregar a los estudiantes guías de estudio detalladas con los pasos exactos que deben seguir para prepararse para cada evaluación.",
-      "Incorporar en la rutina de clase momentos de reflexión metacognitiva donde los estudiantes identifiquen qué aprendieron, qué dificultades encontraron y qué estrategias usaron, con herramientas como diarios de aprendizaje o preguntas de cierre.",
-      "Enseñar a los estudiantes técnicas de memorización (mapas mentales, tarjetas de memoria) que les permitan retener la información más eficientemente.",
-      "Aumentar la frecuencia de las evaluaciones para que los estudiantes reciban retroalimentación constante y puedan identificar sus áreas de mejora a través de los resultados."
-    ], correct:1,
-    feedback:"Los momentos de reflexión metacognitiva donde los estudiantes analizan su propio proceso de aprendizaje desarrollan la capacidad de autorregulación, que incluye planificar, monitorear y ajustar las estrategias. Las guías detalladas generan dependencia sin desarrollar autonomía. Las técnicas de memorización son herramientas útiles pero no desarrollan la metacognición. Más evaluaciones ofrecen información sobre el resultado pero no desarrollan la capacidad de reflexionar sobre el propio proceso."
+      "Enseñar con el ejemplo cómo dar comentarios entre compañeros: mostrar preguntas para ayudar a pensar, qué comentarios sirven y cuáles evitar, y asignar roles que se turnen para que todos participen y el otro niño gane confianza.",
+      "Reorganizar por un tiempo el trabajo en parejas y que la maestra asuma un papel más directivo, dando ella misma los comentarios y mostrando algunas estrategias.",
+      "Observar con atención lo que ocurre y anotar lo más relevante para, más adelante, dar orientaciones generales a todo el grupo.",
+      "Dejar que ellos arreglen sus diferencias entre compañeros, confiando en que así desarrollan la autorregulación y las habilidades socioemocionales."
+    ], correct:0,
+    feedback:"Modelar cómo dar comentarios entre pares (mostrar preguntas que ayudan a pensar, qué comentarios sirven y cuáles evitar) y turnar roles enseña explícitamente a apoyarse con respeto y desarrolla la confianza de ambos. Que la maestra asuma el rol sustituye el apoyo entre pares; solo observar no interviene a tiempo; dejar que resuelvan solos no garantiza que aprendan."
   },
 
-  // CASO 37 — Diferenciación curricular para estudiantes superdotados
+  // CASO 31
   {
-    dim:"Planificación Pedagógica", dimClass:"dim-planificacion",
-    area:"Área 2: Aplicación del currículo",
-    text:"Una docente tiene en su clase a un estudiante que demuestra capacidades excepcionales: comprende los contenidos con mucha rapidez, siempre termina antes que sus compañeros y frecuentemente muestra aburrimiento y desconexión durante las actividades regulares. ¿Qué estrategia curricular es la más apropiada para atender las necesidades educativas de este estudiante?",
+    dim:"Compromiso Personal y Profesional", dimClass:"dim-profesional",
+    area:"Área 4: Cumplimiento de normas institucionales",
+    text:"Una maestra de primaria reflexiona sobre cómo enseñar y evaluar de forma justa en un grupo muy diverso, donde conviven niños con apoyos y recursos muy distintos. Comprende que <span class='ak-p'>tratar a todos exactamente igual —dar lo mismo a quienes parten de situaciones desiguales— no siempre lleva a resultados justos</span>, y que la verdadera equidad puede exigir respuestas diferentes según cada niño. Quiere que su práctica se alinee con ese principio. La maestra sabe que en su grupo conviven realidades muy distintas y que ofrecer exactamente lo mismo a todos puede dejar atrás justo a quienes más necesitan apoyo. Quiere que sus decisiones de enseñanza y de evaluación reflejen el principio de equidad que orienta el sistema educativo dominicano, dando a cada niño lo que requiere para tener oportunidades reales. <span class='ak-q'>¿Qué práctica docente se alinea con el principio de equidad educativa?</span>",
     options:[
-      "Asignarle más ejercicios del mismo tipo para que practique más y no quede inactivo mientras sus compañeros terminan la tarea.",
-      "Designarle como tutor permanente de sus compañeros con mayores dificultades, aprovechando sus capacidades para apoyar al resto del grupo.",
-      "Diseñar actividades de enriquecimiento y profundización que expandan la complejidad del aprendizaje, conecten con sus intereses y le planteen desafíos genuinamente estimulantes.",
-      "Avanzar al estudiante directamente a los contenidos del siguiente grado, para que trabaje siempre con material nuevo y no se aburra."
-    ], correct:2,
-    feedback:"Las actividades de enriquecimiento y profundización que amplían la complejidad y plantean desafíos genuinos son la respuesta más adecuada para un estudiante con capacidades excepcionales. Asignar más ejercicios del mismo tipo es cantidad sin desafío real. Usarlo como tutor permanente instrumentaliza sus capacidades sin atender sus propias necesidades. Avanzar directamente al siguiente grado puede crear vacíos y no garantiza que el contenido sea más desafiante en términos de profundidad."
+      "Centrarse en reconocer el esfuerzo y la participación y corregir menos los errores, con tal de no afectar la motivación.",
+      "Aplicar el mismo método y los mismos criterios de evaluación para todos, en nombre del trato igualitario, sin hacer ningún ajuste.",
+      "Tomar en cuenta el diagnóstico, pero aun así llevar un único plan de actividades para todo el grupo, sin diferenciar apoyos.",
+      "Adaptar la enseñanza y la evaluación a lo que muestra el diagnóstico y a las necesidades del grupo, sumando apoyos diferenciados y ajustes razonables para que todos tengan oportunidades reales de aprender."
+    ], correct:3,
+    feedback:"La equidad implica adaptar la enseñanza y la evaluación a las necesidades del grupo, con apoyos diferenciados y ajustes razonables, garantizando oportunidades reales de aprender. El trato idéntico confunde igualdad con equidad; reducir la corrección no es equidad; un mismo plan sin ajustes ignora la diversidad."
   },
 
-  // CASO 38 — Evaluación de habilidades orales
-  {
-    dim:"Planificación Pedagógica", dimClass:"dim-planificacion",
-    area:"Área 2: Aplicación del currículo",
-    text:"Una docente quiere evaluar las habilidades de comunicación oral de sus estudiantes de forma integral: fluidez, coherencia, uso del vocabulario apropiado y capacidad de argumentación. Ha utilizado solo exposiciones individuales, pero observa que muchos estudiantes se bloquean por los nervios. ¿Qué estrategia diversificaría mejor la evaluación de la comunicación oral?",
-    options:[
-      "Eliminar las evaluaciones orales y sustituirlas por evaluaciones escritas, ya que miden las mismas competencias de comunicación sin generar ansiedad en los estudiantes.",
-      "Continuar con las exposiciones individuales pero realizarlas en grupos pequeños de compañeros en lugar de ante todo el grupo, para reducir la presión.",
-      "Diversificar los formatos de evaluación oral (debates, entrevistas, simulaciones, presentaciones en grupo) con rúbricas claras, práctica previa y retroalimentación formativa durante el proceso.",
-      "Evaluar la comunicación oral de forma informal durante las discusiones de clase, sin usar instrumentos formales, para que los estudiantes no sientan presión."
-    ], correct:2,
-    feedback:"Diversificar los formatos de evaluación oral ofrece múltiples oportunidades para que los estudiantes demuestren sus habilidades en diferentes contextos, con retroalimentación formativa y criterios explícitos. Las evaluaciones escritas no evalúan las habilidades orales. Las exposiciones en grupos pequeños reducen la ansiedad pero limitan las formas de comunicación evaluadas. La evaluación informal sin instrumentos no garantiza sistematicidad ni criterios claros."
-  },
-
-  // CASO 39 — Ambiente de aprendizaje positivo
+  // CASO 32
   {
     dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
     area:"Área 3: Resultados de aprendizaje de los estudiantes",
-    text:"Un docente nuevo percibe que el clima de su aula es tenso: los estudiantes temen cometer errores, evitan participar por miedo a equivocarse frente a sus compañeros y hay poca disposición para el trabajo colaborativo. ¿Qué estrategia es la más efectiva para construir un ambiente de aprendizaje donde el error sea concebido como oportunidad de aprendizaje?",
+    text:"En un grupo de primaria, <span class='ak-c'>uno de los niños presenta dislexia</span>. Se esfuerza y muestra interés, pero <span class='ak-p'>se cansa al leer textos largos, se salta información y confunde instrucciones</span>; en cambio, comprende mucho mejor cuando la explicación es oral o se apoya en imágenes. Sin embargo, los materiales y las evaluaciones se basan casi todos en textos extensos, lo que lo deja en desventaja y no refleja lo que realmente sabe. El maestro sabe que la dislexia no tiene que ver con la inteligencia del niño, sino con la forma en que procesa la lectura, y que con los apoyos adecuados puede aprender igual que sus compañeros. Le preocupa que las evaluaciones basadas en textos largos midan más su dificultad que sus aprendizajes, por lo que busca adaptaciones que reflejen lo que de verdad sabe. <span class='ak-q'>¿Qué adaptación de metodología y recursos favorecería su acceso al aprendizaje?</span>",
     options:[
-      "Establecer reglas estrictas de comportamiento y aplicar consecuencias cuando los estudiantes se burlen de los errores de sus compañeros para disuadir conductas negativas.",
-      "Modelar una actitud positiva ante el error propio, valorar explícitamente los intentos aunque sean incorrectos, crear rutinas donde el error sea parte natural del proceso y enseñar a los estudiantes a dar retroalimentación constructiva.",
-      "Reducir la complejidad de las actividades para minimizar la posibilidad de error y aumentar gradualmente la dificultad solo cuando el grupo demuestre mayor confianza.",
-      "Evitar que los estudiantes compartan sus producciones con el grupo hasta que estén completamente terminadas y corregidas, para protegerlos de críticas prematuras."
-    ], correct:1,
-    feedback:"Modelar la actitud positiva ante el error, valorar los intentos y crear rutinas donde el error sea parte natural del proceso son las estrategias más efectivas para transformar el clima del aula. Las reglas y consecuencias pueden controlar comportamientos externos pero no modifican la cultura del error. Reducir la complejidad evita el error pero también reduce el aprendizaje. Evitar compartir producciones no resuelve el problema y priva a los estudiantes de retroalimentación valiosa."
+      "Conservar la misma metodología con cambios mínimos, manteniendo los mismos materiales para todos y agregando apoyos solo en momentos puntuales.",
+      "Fomentar la lectura en voz alta con frecuencia e ir adaptando los textos poco a poco, con algún apoyo visual de vez en cuando.",
+      "Incorporar apoyos como tipografías legibles (por ejemplo OpenDyslexic o Arial ampliada), textos cortos y adaptados, imágenes y recursos audiovisuales, para que comprenda y participe en igualdad de condiciones.",
+      "Asignarle actividades extra individuales, acompañadas de algunos apoyos concretos durante la actividad principal."
+    ], correct:2,
+    feedback:"Incorporar tipografías legibles, textos adaptados, imágenes y recursos audiovisuales atiende directamente las características de la dislexia y facilita la comprensión y la participación. Mantener la misma metodología o exigir lectura frecuente en voz alta no responde a la necesidad; las actividades extra individuales pueden segregar en lugar de adaptar el acceso al contenido común."
   },
 
-  // CASO 40 — Planificación inversa (backward design)
+  // CASO 33
+  {
+    dim:"Compromiso Personal y Profesional", dimClass:"dim-profesional",
+    area:"Área 4: Cumplimiento de normas institucionales",
+    text:"Un niño de primaria presenta a lo largo del período <span class='ak-c'>dificultades de aprendizaje que no han cedido pese a los apoyos brindados y, a la vez, problemas para integrarse con sus compañeros</span>: le cuesta relacionarse, tiende a aislarse y participa cada vez menos. El maestro, que lo conoce y lo acompaña, concluye que la situación desborda lo que él puede atender solo en el aula y que probablemente involucra aspectos familiares, emocionales y sociales. La situación ha empezado a afectar también su asistencia. El maestro sabe que algunas situaciones desbordan lo que un docente puede resolver solo y que el sistema educativo cuenta con equipos y protocolos justamente para estos casos. Quiere actuar a tiempo y de forma coordinada, sumando a la familia y a la escuela, porque entiende que el bienestar del niño es una responsabilidad compartida. <span class='ak-q'>¿Qué estrategia de trabajo colaborativo con la comunidad educativa permitiría brindar un apoyo integral al niño?</span>",
+    options:[
+      "Comunicarse con la familia para conocer el contexto y lo que ya se ha intentado, e incorporar esa información a las decisiones que toma en clase.",
+      "Pasar formalmente el caso al equipo de orientación y a la dirección, activando los protocolos y dejando en manos de los especialistas la valoración y el seguimiento.",
+      "Probar primero algunas estrategias en el aula, registrar los avances y, si las dificultades continúan, gestionar la derivación al equipo de orientación.",
+      "Articular el trabajo entre el equipo de orientación, la familia y los demás docentes del niño, para acordar entre todos estrategias compartidas que apoyen tanto su aprendizaje como su integración en la vida escolar."
+    ], correct:3,
+    feedback:"Coordinar de forma articulada con el equipo de orientación, la familia y los docentes vinculados, para acordar estrategias compartidas, brinda un apoyo integral, pues la situación supera el aula. Solo hablar con la familia, solo derivar o solo intervenir en el aula son acciones parciales que no integran a todos los actores."
+  },
+
+  // CASO 34
+  {
+    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
+    area:"Área 3: Resultados de aprendizaje de los estudiantes",
+    text:"En un grupo de primaria, una maestra tiene <span class='ak-c'>varios niños en condición de sobreedad</span>, mayores que la edad típica del grado. En lo académico cumplen, pero la maestra nota que <span class='ak-p'>muestran menos interés por algunas actividades y tienden a aislarse o a quedarse al margen</span> en los trabajos en grupo, y sienten que las dinámicas del aula no conectan con sus vivencias e intereses, distintos de los de sus compañeros más pequeños. La maestra intuye que, si no logra esa conexión, podrían desvincularse. La maestra sabe que la sobreedad suele venir acompañada de experiencias de fracaso o de interrupciones en la escolaridad, y que estos niños necesitan sentir que pertenecen al grupo. Le preocupa que, si las actividades no conectan con sus intereses y vivencias, terminen por desvincularse y abandonar, por lo que busca integrarlos de manera genuina. <span class='ak-q'>¿Qué estrategia favorecería una integración efectiva de estos niños?</span>",
+    options:[
+      "Repartir a estos niños por el aula para que se apoyen en otros compañeros y evitar que conversen entre ellos de cosas ajenas a la clase.",
+      "Sentarlos cerca de la maestra para vigilar de cerca su trabajo y darles apoyo cuando haga falta.",
+      "Incluir en la clase el trabajo en pequeños grupos y aprovecharlo para incorporar recursos y temas elegidos según las necesidades, vivencias e intereses de estos niños, de modo que se sientan parte del grupo.",
+      "Prepararles materiales sobre temas que les gusten, distintos de los del resto, y asignarles tareas aparte del grupo."
+    ], correct:2,
+    feedback:"Incluir el trabajo en pequeños grupos e integrar recursos y temas conectados con sus intereses y vivencias favorece la integración efectiva sin segregar. Repartirlos para controlarlos o sentarlos cerca de la maestra responde a la vigilancia, no a la integración; darles temas y tareas distintos de los del grupo los separa."
+  },
+
+  // CASO 35
   {
     dim:"Planificación Pedagógica", dimClass:"dim-planificacion",
     area:"Área 2: Aplicación del currículo",
-    text:"Una docente quiere asegurar que su planificación esté orientada al logro de los aprendizajes esperados y no solo a la cobertura de contenidos. Desea revisar su forma de planificar para que haya mayor coherencia entre los resultados de aprendizaje, la evaluación y las actividades. ¿Cuál de los siguientes enfoques de planificación es el más apropiado para este propósito?",
+    text:"<span class='ak-m'>Tras trabajar con un proyecto</span> en una unidad de Ciencias Sociales, una maestra de primaria se dispone a evaluar el trabajo de sus estudiantes. No quiere quedarse solo con el producto final, porque sabe que durante el camino ocurrieron aprendizajes importantes: investigar, colaborar, tomar decisiones y resolver problemas. Busca una forma de evaluación que le permita <span class='ak-p'>valorar tanto el proceso como el producto</span>, con retroalimentación a lo largo del proyecto y no solo al final. La maestra sabe que un proyecto pone en juego muchas más cosas que un contenido: investigar, organizarse, colaborar y resolver problemas reales. Quiere que su forma de evaluar haga justicia a todo ese recorrido y no se reduzca a una nota sobre el resultado final, recogiendo evidencias a lo largo del proceso y ofreciendo retroalimentación oportuna. <span class='ak-q'>¿Qué forma de evaluación sería la más coherente con el trabajo por proyectos?</span>",
     options:[
-      "Planificar comenzando por seleccionar las actividades más interesantes y motivadoras, y luego determinar qué aprendizajes podrían generarse a partir de ellas.",
-      "Planificar siguiendo el orden del libro de texto, asegurándose de cubrir todos los temas del programa antes del fin del período.",
-      "Planificar comenzando por definir claramente qué deben saber, comprender y ser capaces de hacer los estudiantes al finalizar la unidad, luego determinar las evidencias que demostrarán ese aprendizaje y finalmente diseñar las actividades que lo desarrollen.",
-      "Planificar priorizando las actividades que los estudiantes más disfrutan, para asegurar su motivación y participación activa durante toda la unidad."
-    ], correct:2,
-    feedback:"El diseño inverso (backward design) parte de los resultados de aprendizaje esperados, luego define las evidencias de logro y finalmente diseña las actividades. Este enfoque garantiza la coherencia entre lo que se quiere lograr, cómo se evaluará y qué actividades son necesarias para lograrlo. Comenzar por las actividades más interesantes invierte la lógica y puede llevar a la cobertura sin propósito. Seguir el libro de texto puede cubrir contenidos sin garantizar los aprendizajes esperados. Priorizar lo que más disfrutan los estudiantes puede comprometer el rigor pedagógico."
-  }
+      "Una evaluación auténtica que recoja evidencias tanto del proceso como del producto, alineadas con las competencias, con retroalimentación a lo largo del proyecto y no únicamente al final.",
+      "Una prueba escrita igual para todos al terminar el proyecto, para comparar a los niños, centrada en los contenidos.",
+      "Informes individuales al cierre para comprobar si entendieron los temas, dejando el trabajo en equipo como algo secundario.",
+      "Valorar sobre todo el producto final con una rúbrica de presentación, priorizando la calidad de lo entregado."
+    ], correct:0,
+    feedback:"La evaluación auténtica que integra evidencias del proceso y del producto, con retroalimentación continua, es la más coherente con el trabajo por proyectos, pues capta la investigación, la colaboración y la aplicación de lo aprendido. La prueba estandarizada, los informes individuales o valorar solo el producto final no reflejan la riqueza del proceso."
+  },
 
+  // CASO 36
+  {
+    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
+    area:"Área 3: Resultados de aprendizaje de los estudiantes",
+    text:"En la clase de Ciencias, un maestro nota que un niño <span class='ak-p'>no logra diferenciar ni comprender conceptos importantes de la asignatura y tiende a memorizar las definiciones</span> sin entender qué significan ni para qué sirven, por lo que las confunde y no puede usarlas. El maestro entiende que repetir las definiciones no resuelve el fondo, y quiere que el niño comprenda los conceptos de forma práctica, relacionándolos con ejemplos y situaciones concretas. El maestro sabe que un concepto no se comprende por repetir su definición, sino por usarlo y relacionarlo con situaciones concretas. Le preocupa que el niño avance arrastrando confusiones que después le dificultarán otros aprendizajes, por lo que busca que comprenda de verdad para qué sirve cada idea y cómo aplicarla. <span class='ak-q'>¿Qué estrategia favorecería la comprensión real de estos conceptos?</span>",
+    options:[
+      "Trabajar los conceptos con algún ejemplo suelto para interpretar imágenes o esquemas y profundizar en su función cuando se presente la ocasión.",
+      "Corregirlo de inmediato cada vez que confunda un término y repetir las definiciones para que las memorice y las use bien.",
+      "Pedirle que busque los términos y arme un pequeño glosario para tener las definiciones a mano cuando dude.",
+      "Explicar los conceptos apoyándose en imágenes, esquemas, objetos y otros recursos visuales, y proponer actividades para aplicarlos y compararlos, de modo que comprenda su significado, su uso y su función de forma práctica."
+    ], correct:3,
+    feedback:"Explicar los conceptos con recursos concretos (imágenes, esquemas, objetos) y proponer actividades de aplicación y comparación construye significado y favorece el uso, superando la memorización. Los ejemplos sueltos, las correcciones repetitivas o el glosario refuerzan la definición memorizada sin abordar la comprensión."
+  },
+
+  // CASO 37
+  {
+    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
+    area:"Área 3: Resultados de aprendizaje de los estudiantes",
+    text:"Al planificar un proyecto de aula, una maestra de primaria observa que <span class='ak-p'>su grupo muestra muy poco interés</span> por las actividades propuestas: las sienten ajenas, sin relación con su vida, y por eso participan con desgano. La maestra entiende que parte del problema está en cómo se plantean los objetivos, demasiado centrados en cubrir contenidos y poco conectados con lo que a los niños les importa. Antes de seguir, quiere replantear los objetivos del proyecto. La maestra sabe que en primaria la motivación se enciende cuando los niños sienten que lo que hacen tiene que ver con su mundo. Le preocupa que, si las actividades siguen sintiéndose ajenas, el desgano se vuelva costumbre, por lo que quiere revisar de raíz el modo en que plantea los objetivos del proyecto antes de continuar. <span class='ak-q'>¿Qué criterio debería guiar la selección de los objetivos del proyecto?</span>",
+    options:[
+      "Elegir objetivos relacionados con los intereses de los niños y con situaciones reales de su vida, para que encuentren sentido y disfruten lo que van a hacer.",
+      "Plantear objetivos que respondan sobre todo al currículo oficial, dando prioridad a cubrir el programa más que a conectar con los niños.",
+      "Definir objetivos iguales para todos, supuestamente adaptados a sus intereses y ritmos y alineados al currículo.",
+      "Fijar objetivos centrados en adquirir información, procurando que reciban datos importantes vinculados a su vida diaria."
+    ], correct:0,
+    feedback:"Seleccionar objetivos conectados con los intereses de los niños y con situaciones reales de su vida aumenta el sentido y la motivación, favoreciendo una participación auténtica. Ajustar los objetivos solo a la cobertura curricular, plantearlos uniformes o centrarlos en adquirir información no atiende la falta de relevancia que origina el bajo interés."
+  },
+
+  // CASO 38
+  {
+    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
+    area:"Área 3: Resultados de aprendizaje de los estudiantes",
+    text:"En un grupo de primaria, <span class='ak-p'>varios niños evitan participar</span> en las actividades, por timidez o por miedo a equivocarse delante de los demás. El maestro nota que, cuando las tareas se plantean de forma poco organizada, estos niños se quedan al margen y dejan que otros hagan el trabajo. Quiere promover la colaboración, la corresponsabilidad y que todos se impliquen, de modo que cada niño tenga un papel claro y se sienta parte. El maestro sabe que la timidez y el miedo a equivocarse son frecuentes en estas edades y que la organización de la actividad puede animar o frenar la participación. Quiere que cada niño tenga un papel claro y se sienta seguro de aportar, de modo que la colaboración se convierta en una vía para que todos se impliquen y aprendan juntos. <span class='ak-q'>¿Qué estrategia favorecería la participación y el trabajo colaborativo?</span>",
+    options:[
+      "Dejar que cada quien decida cuánto participa y hacia dónde va el trabajo, delegando en los niños la conducción en nombre de la autonomía.",
+      "Hacer las actividades en grupo, pero con la misma forma de siempre, priorizando que la clase esté ordenada y que se cumpla el contenido.",
+      "Organizar trabajos en grupo bien estructurados y motivadores, con roles claros según las fortalezas e intereses de cada niño, fomentando que se necesiten unos a otros, la corresponsabilidad y el aprendizaje en conjunto.",
+      "Ofrecer premios individuales para impulsar una competencia sana, animando a cada niño a perseguir sus propias metas."
+    ], correct:2,
+    feedback:"Organizar actividades estructuradas y motivadoras con roles claros según fortalezas e intereses, promoviendo la interdependencia y la corresponsabilidad, construye un trabajo cooperativo en el que todos participan. Dejar la participación a la libre decisión mantiene el desbalance; conservar la forma que ya falla no resuelve; las recompensas individuales fomentan la competencia, no la cooperación."
+  },
+
+  // CASO 39
+  {
+    dim:"Gestión del Aprendizaje", dimClass:"dim-gestion",
+    area:"Área 3: Resultados de aprendizaje de los estudiantes",
+    text:"Una maestra de sexto grado nota que sus estudiantes <span class='ak-p'>usan casi siempre las mismas palabras y muchas expresiones muy informales</span>, incluso al exponer o escribir, donde se espera un lenguaje más cuidado. La maestra no quiere corregir su forma de hablar todo el tiempo, pero sí ayudarlos a ampliar su vocabulario y a darse cuenta de que hay maneras distintas de expresarse según cada situación. La maestra sabe que ampliar el lenguaje es un objetivo del Nivel Primario y que en sexto grado los niños ya pueden reflexionar sobre cómo se expresan según el contexto. No busca censurar su forma de hablar, sino enriquecer su vocabulario y mostrarles que existen distintos registros, para que aprendan a elegir el más adecuado a cada situación. <span class='ak-q'>¿Qué intervención enriquecería el lenguaje y ayudaría a usarlo según la situación?</span>",
+    options:[
+      "Corregir cada vez que aparezcan esas expresiones, orientando a los niños hacia otras consideradas más adecuadas.",
+      "Establecer claramente qué expresiones no se usan en clase y recordar de vez en cuando que en ese espacio se necesita un lenguaje más cuidado.",
+      "Dedicar momentos breves a jugar con el lenguaje y conversar sobre las palabras que usan, ayudándolos a descubrir sinónimos, matices y formas de expresarse según la situación, para que elijan la más adecuada.",
+      "Permitir libremente esas expresiones en el día a día, entendiendo que forman parte de la forma de hablar de los niños."
+    ], correct:2,
+    feedback:"Dedicar momentos a analizar y jugar con el lenguaje, descubriendo sinónimos, matices y formas según la situación, amplía el vocabulario y promueve un uso consciente, sin censurar. Corregir o prohibir expresiones impone sin desarrollar conciencia; tolerar sin mediación no enriquece el lenguaje."
+  },
+
+  // CASO 40
+  {
+    dim:"Compromiso Personal y Profesional", dimClass:"dim-profesional",
+    area:"Área 4: Cumplimiento de normas institucionales",
+    text:"Una maestra de primaria observa en uno de sus niños <span class='ak-c'>moretones visibles que se repiten en distintas partes del cuerpo</span>, además de una actitud temerosa y de evitar hablar cuando se le pregunta. Las señales se repiten durante varias semanas y la maestra no puede descartar que exista una situación de violencia en el hogar. Consciente de su responsabilidad y de la normativa de protección de la niñez, debe decidir cómo actuar de inmediato. La maestra sabe que el deber de proteger a la niñez está por encima de cualquier otra consideración y que existe un protocolo claro que ella debe seguir. Es consciente de que actuar de forma equivocada —o no actuar— puede aumentar el riesgo para el niño, por lo que necesita tener muy presente qué establece la normativa para casos como este. <span class='ak-q'>De acuerdo con el Código de Ética del MINERD y la Ley 136-03, usted debe:</span>",
+    options:[
+      "Esperar a que el propio niño confirme el maltrato antes de actuar, para no proceder por una simple sospecha.",
+      "Citar a los padres a la escuela para interrogarlos sobre la situación y averiguar de dónde salen las lesiones.",
+      "Reportar la sospecha al Consejo de Protección, conforme a la Ley 136-03, de forma confidencial y en un plazo no mayor de 24 horas, activando el protocolo de protección.",
+      "Tratar el tema abiertamente en clase para que el niño se sienta respaldado por sus compañeros."
+    ], correct:2,
+    feedback:"Ante indicios de maltrato a un niño, el deber del docente es reportar la sospecha al órgano de protección de forma confidencial y oportuna (en un plazo no mayor de 24 horas), conforme a la Ley 136-03 y al Código de Ética del MINERD. Esperar la confirmación, interrogar a los padres o exponer el caso en clase vulnera la protección del niño y puede agravar el riesgo."
+  },
 ];
 
 /* =========================================================
@@ -1165,7 +1133,7 @@ function shuffleArray(arr) {
 }
 
 function prepareQuestions() {
-  shuffledQuestions = rawQuestions.map(q => {
+  shuffledQuestions = shuffleArray(rawQuestions).map(q => {
     const opts = q.options.map((txt, idx) => ({ txt, isCorrect: idx === q.correct }));
     const shuffled = shuffleArray(opts);
     const newCorrect = shuffled.findIndex(o => o.isCorrect);
@@ -1191,7 +1159,7 @@ function renderQuestion(skipScroll) {
 
   document.getElementById('q-number').textContent = `CASO ${currentQ + 1} DE ${shuffledQuestions.length}`;
   document.getElementById('q-counter').textContent = `${currentQ + 1} / ${shuffledQuestions.length}`;
-  document.getElementById('q-text').textContent    = q.text;
+  document.getElementById('q-text').innerHTML      = q.text;
   document.getElementById('area-tag').textContent  = q.area;
 
   const dimTag = document.getElementById('dim-tag');
@@ -1268,7 +1236,9 @@ function showResults() {
   const score = answers.filter((a, i) => a === shuffledQuestions[i].correct).length;
   const pct   = Math.round(score / shuffledQuestions.length * 100);
 
-  document.getElementById('res-score').textContent   = pct + '%';
+  const points = Math.round(score * (20 / shuffledQuestions.length) * 10) / 10;
+  document.getElementById('res-score').textContent   = points + ' / 20';
+  var _rl = document.querySelector('.result-label'); if (_rl) _rl.textContent = 'Puntuación Final · ' + pct + '%';
   document.getElementById('res-correct').textContent = score;
   document.getElementById('res-wrong').textContent   = shuffledQuestions.length - score;
 
@@ -1449,13 +1419,14 @@ function construirPDF(jsPDF) {
   const GRIS2   = [100, 100, 100];
   const VERDE   = [62,  109, 163];
   const DORADO  = [201, 148, 58 ];
-  const CORREC  = [46,  169, 106];
+  const CORREC  = [62, 109, 163];
   const WRONG   = [200, 100, 20 ];
-  const CORREC_BG = [10, 40, 20];
+  const CORREC_BG = [14, 39, 64];
   const WRONG_BG  = [40, 20,  5];
 
   const score    = answers.filter((a,i) => a === shuffledQuestions[i].correct).length;
   const pct      = Math.round(score / shuffledQuestions.length * 100);
+  const points   = Math.round(score * (20 / shuffledQuestions.length) * 10) / 10;
   const total    = shuffledQuestions.length;
   const fecha    = new Date().toLocaleDateString('es-DO',{day:'2-digit',month:'long',year:'numeric'});
   const tiempo   = timerFinalStr;
@@ -1475,7 +1446,7 @@ function construirPDF(jsPDF) {
     setFill(OSCURO); doc.rect(0, PH-9, PW, 9, 'F');
     setStroke(VERDE); doc.setLineWidth(0.3); doc.line(0, PH-9, PW, PH-9);
     doc.setFontSize(6.5); doc.setFont('helvetica','normal'); setColor(GRIS2);
-    doc.text('Simulador ERP 2 · Docente Técnico Profesional · MINERD', ML, PH-3.5);
+    doc.text('Simulador ERP 5 · Docente de Primaria · MINERD', ML, PH-3.5);
     doc.text(`Página ${pageNum}`, PW-MR, PH-3.5, {align:'right'});
   }
 
@@ -1503,9 +1474,9 @@ function construirPDF(jsPDF) {
   doc.text('ERP', ML+10, 15.5, {align:'center'});
 
   doc.setFontSize(15); doc.setFont('helvetica','bold'); setColor(BLANCO);
-  doc.text('Informe de Resultados — Simulador 2', ML+24, 15);
+  doc.text('Informe de Resultados — Simulador 5', ML+24, 15);
   doc.setFontSize(7.5); doc.setFont('helvetica','normal'); setColor(GRIS);
-  doc.text('EJERCICIO DE RENDIMIENTO PROFESIONAL · TÉCNICO PROFESIONAL', ML+24, 21);
+  doc.text('EJERCICIO DE RENDIMIENTO PROFESIONAL · NIVEL PRIMARIO', ML+24, 21);
 
   doc.setFontSize(7.5); setColor(GRIS);
   doc.text('Ministerio de Educación de la República Dominicana', ML, 32);
@@ -1515,10 +1486,10 @@ function construirPDF(jsPDF) {
   y = 58;
   const PCTC = pct >= 75 ? CORREC : pct >= 60 ? DORADO : WRONG;
   filledRect(ML, y, CW, 34, OSCURO); setStroke(VERDE); doc.setLineWidth(0.3); doc.rect(ML, y, CW, 34);
-  doc.setFontSize(30); doc.setFont('helvetica','bold'); setColor(PCTC);
-  doc.text(`${pct}%`, PW/2, y+19, {align:'center'});
+  doc.setFontSize(22); doc.setFont('helvetica','bold'); setColor(PCTC);
+  doc.text(`${points} / 20`, PW/2, y+19, {align:'center'});
   doc.setFontSize(7); doc.setFont('helvetica','normal'); setColor(GRIS);
-  doc.text('PUNTUACIÓN FINAL', PW/2, y+27, {align:'center'});
+  doc.text(`PUNTUACIÓN FINAL · ${pct}%`, PW/2, y+27, {align:'center'});
 
   y += 41;
   const bw = (CW-8)/3;
@@ -1542,14 +1513,14 @@ function construirPDF(jsPDF) {
   doc.text(msgs[mIdx], PW/2, y, {align:'center'});
 
   y += 7;
-  const sus = wrap('Sustentado en: Componente Académico Técnico Profesional y Artes · Estándares Profesionales y del Desempeño Docente · Ley 136-03 · Código de Ética Docente (OD 22/2023)', CW, 6.5, 'italic');
+  const sus = wrap('Sustentado en: Diseño Curricular del Nivel Primario · Estándares Profesionales y del Desempeño Docente · Ley 136-03 · Código de Ética Docente (OD 22/2023)', CW, 6.5, 'italic');
   setColor(GRIS2); sus.forEach(l => { doc.text(l, PW/2, y, {align:'center'}); y+=4; });
 
   y += 3;
   setStroke(VERDE); doc.setLineWidth(0.3); doc.line(ML, y, PW-MR, y);
   y += 6;
   doc.setFontSize(8.5); doc.setFont('helvetica','bold'); setColor(BLANCO);
-  doc.text('Detalle completo de los 50 casos respondidos', PW/2, y, {align:'center'});
+  doc.text(`Detalle completo de los ${shuffledQuestions.length} casos respondidos`, PW/2, y, {align:'center'});
   y += 4;
   doc.setFontSize(6.5); doc.setFont('helvetica','normal'); setColor(GRIS);
   doc.text('Cada caso muestra la respuesta seleccionada, la respuesta correcta y su retroalimentación normativa.', PW/2, y, {align:'center'});
@@ -1564,7 +1535,7 @@ function construirPDF(jsPDF) {
     const ACCENT  = isOk ? CORREC : WRONG;
     const FB_BG   = isOk ? CORREC_BG : WRONG_BG;
 
-    const qLines  = wrap(q.text, CW-4, 8.5, 'bold');
+    const qLines  = wrap(q.text.replace(/<[^>]+>/g,''), CW-4, 8.5, 'bold');
     let optH = 0;
     q.options.forEach((opt,oi) => {
       const isTagged = (oi === userAns) || (oi === q.correct);
@@ -1653,7 +1624,7 @@ function construirPDF(jsPDF) {
     y += 5;
   });
 
-  doc.save(`Informe_ERP2_${fecha.replace(/\s/g,'_').replace(/,/g,'')}.pdf`);
+  doc.save(`Informe_Simulador3_${fecha.replace(/\s/g,'_').replace(/,/g,'')}.pdf`);
 }
 
 // ── NAV PANEL ────────────────────────────────────────────────
